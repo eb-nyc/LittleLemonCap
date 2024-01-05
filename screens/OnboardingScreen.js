@@ -69,6 +69,9 @@ export default function OnboardingScreen() {
       <Text style={styles.regularText}>
         Let us get to know you
       </Text>
+      <Text style={styles.regularKarla}>
+        Let us get to know you
+      </Text>
       <TextInput
           style={styles.inputBox}
           value={email}
@@ -146,6 +149,14 @@ const styles = StyleSheet.create({
   },
   regularText: {
     fontSize: 22,
+    padding: 20,
+    marginVertical: 8,
+    color: 'black',
+    textAlign: 'center',
+  },
+  regularKarla: {
+    fontSize: 22,
+    fontFamily: "Karla",
     padding: 20,
     marginVertical: 8,
     color: 'black',
