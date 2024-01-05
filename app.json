@@ -32,7 +32,7 @@
         {
           "fonts": [
             "./assets/fonts/Karla.ttf",
-            "./assets/fonts/Markazi Text.ttf"
+            "./assets/fonts/MarkaziText.ttf"
           ]
         }
       ]
