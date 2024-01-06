@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, Text, StyleSheet, TextInput, Image, Pressable, Alert} from 'react-native';
 import { validateEmail } from '../utils';
+import * as Font from 'expo-font';
 
 export default function OnboardingScreen() {
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
@@ -8,7 +9,24 @@ export default function OnboardingScreen() {
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
   const emailInputRef = React.createRef();   //Ref to store reference to TextInput component
   const pressableInputRef = React.createRef(); //Ref to store reference to current Pressable
+  const [fontLoaded, setFontLoaded] = useState(false);
 
+  // Function to load up the necessary fonts
+  useEffect(() => {
+    async function loadFont() {
+      await Font.loadAsync({
+        'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
+        'Karla': require('../assets/fonts/Karla.ttf'),
+      });
+      setFontLoaded(true);
+    }
+
+    loadFont();
+  }, []);
+
+  if (!fontLoaded) {
+    return null; // or a loading indicator
+  }
 
   // function to remove the keyboard - used when valid email address is submitted
   const dismissKeyboard = () => {
@@ -67,6 +85,9 @@ export default function OnboardingScreen() {
         accessibilityLabel={'Little Lemon alternate grey logo'}
       />
       <Text style={styles.regularText}>
+        Let us get to know you
+      </Text>
+      <Text style={styles.subtitleMarkazi}>
         Let us get to know you
       </Text>
       <TextInput
@@ -149,6 +170,22 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     color: 'black',
+    textAlign: 'center',
+  },
+  regularKarla: {
+    fontSize: 22,
+    fontFamily: "Karla",
+    padding: 20,
+    marginVertical: 8,
+    color: 'black',
+    textAlign: 'center',
+  },
+  subtitleMarkazi: {
+    fontSize: 40,
+    fontFamily: "MarkaziText",
+    padding: 10,
+    marginVertical: 8,
+    color: '#48742C',
     textAlign: 'center',
   },
   inputBox: {
