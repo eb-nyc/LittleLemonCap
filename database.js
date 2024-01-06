@@ -30,9 +30,6 @@ export async function getMenuItems() {
   });
 }
 
-//      'insert into menuitems (uuid, title, price, category) values (?, ?, ?, ?)', 
-//      [menuItems.id, menuItems.title, menuItems.price, menuItems.category]
-
 // *saveMenuItems* populates the SQLite table 'menuitems' with data from the JSON via fetchData > getMenuItems > menuItems 
 // Ref: Coursera Note - 2. Implement a single SQL statement to save all menu data in a table called menuitems.
 // Note that Coursera suggested the following code:

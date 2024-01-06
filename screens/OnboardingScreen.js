@@ -20,12 +20,10 @@ export default function OnboardingScreen() {
       });
       setFontLoaded(true);
     }
-
     loadFont();
   }, []);
-
   if (!fontLoaded) {
-    return null; // or a loading indicator
+    return null; // or a I can insert a loading indicator graphic here
   }
 
   // function to remove the keyboard - used when valid email address is submitted
@@ -54,7 +52,8 @@ export default function OnboardingScreen() {
     onChangeEmail(''); 
   }
 
-  // function to determine which prompt should be presented to user depending text in the input area is a valid email and if an email was already provided
+  // function to determine which prompt should be presented to user depending if text in the input area  
+  // is a valid email (validEmail) and if an email was already provided (subscribed).
   const processEmailSubmission = () => {
     {(!validEmail && !subscribed) && (
       handleInvalidEmail() )}
@@ -73,7 +72,8 @@ export default function OnboardingScreen() {
     onChangeEmail(enteredEmail);
   };
 
-  // four(4) conditions are evaluated to determine what functions are performed when the Pressable is activated. 
+  // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
+  // to determine what functions are performed when the Pressable is activated. 
   return (
     <>
     <View style={styles.container}>
@@ -84,9 +84,6 @@ export default function OnboardingScreen() {
         accessible={true}
         accessibilityLabel={'Little Lemon alternate grey logo'}
       />
-      <Text style={styles.regularText}>
-        Let us get to know you
-      </Text>
       <Text style={styles.subtitleMarkazi}>
         Let us get to know you
       </Text>
