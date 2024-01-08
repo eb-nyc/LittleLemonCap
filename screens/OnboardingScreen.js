@@ -1,15 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {View, Text, StyleSheet, TextInput, Image, Pressable, Alert} from 'react-native';
 import { validateEmail } from '../utils';
 import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OnboardingScreen() {
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
   const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
-  const emailInputRef = React.createRef();   //Ref to store reference to TextInput component
-  const pressableInputRef = React.createRef(); //Ref to store reference to current Pressable
+  const emailInputRef = useRef();   //Ref to store reference to TextInput component
+  const pressableInputRef = useRef(); //Ref to store reference to current Pressable
   const [fontLoaded, setFontLoaded] = useState(false);
+  const [displayEmail, setDisplayEmail] = useState('');
+
+  // Function to transfer device's userprofile data from AsyncStorage to userprofile variable, if any exists.
+  // This is only done once when this component first renders.
+
+  const loadUserEmail = async () => {
+    try {
+      const userEmailString = await AsyncStorage.getItem('userEmail');
+      if (userEmailString !== null) {
+        onChangeEmail(userEmailString);
+        setDisplayEmail(userEmailString);
+      }
+    } catch (e) {
+      console.error(`Error loading user profile: `, e);
+    }
+  };
+  useEffect(() => {
+    loadUserEmail();
+}, []);
+
+
+  // Function to save new user-provided info to the user profile array saved to AsyncStorage
+const saveUserEmail = async () => {
+    try {
+    await AsyncStorage.setItem('userEmail', email);
+    } catch (e) {
+    console.error(`Error saving user profile: `,e);
+    }
+};
+//useEffect(() => {saveUserEmail();}, [email]);
+
 
   // Function to load up the necessary fonts
   useEffect(() => {
@@ -20,13 +52,12 @@ export default function OnboardingScreen() {
       });
       setFontLoaded(true);
     }
-
     loadFont();
   }, []);
-
   if (!fontLoaded) {
-    return null; // or a loading indicator
+    return null; // or a I can insert a loading indicator graphic here
   }
+
 
   // function to remove the keyboard - used when valid email address is submitted
   const dismissKeyboard = () => {
@@ -43,18 +74,21 @@ export default function OnboardingScreen() {
     Alert.alert(`Thanks for subscribing.\nStay tuned!`); 
     setSubscribed(true); 
     dismissKeyboard(); 
+    saveUserEmail();
     onChangeEmail(''); 
-  };
+    };
 
   // function to alert user that their email address as been updated with the submitted email
   const handleEmailUpdate = () => {
     Alert.alert(`Thank you\nYour email has been updated.`); 
     setSubscribed(true); 
     dismissKeyboard(); 
+    saveUserEmail();
     onChangeEmail(''); 
-  }
+    }
 
-  // function to determine which prompt should be presented to user depending text in the input area is a valid email and if an email was already provided
+  // function to determine which prompt should be presented to user depending if text in the input area  
+  // is a valid email (validEmail) and if an email was already provided (subscribed).
   const processEmailSubmission = () => {
     {(!validEmail && !subscribed) && (
       handleInvalidEmail() )}
@@ -73,10 +107,11 @@ export default function OnboardingScreen() {
     onChangeEmail(enteredEmail);
   };
 
-  // four(4) conditions are evaluated to determine what functions are performed when the Pressable is activated. 
+  // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
+  // to determine what functions are performed when the Pressable is activated. 
   return (
     <>
-    <View style={styles.container}>
+    <View style={styles.pageContainer}>
       <Image
         style={styles.image}
         source={require('../assets/little-lemon-logo-grey.png')}
@@ -84,11 +119,11 @@ export default function OnboardingScreen() {
         accessible={true}
         accessibilityLabel={'Little Lemon alternate grey logo'}
       />
-      <Text style={styles.regularText}>
-        Let us get to know you
-      </Text>
       <Text style={styles.subtitleMarkazi}>
-        Let us get to know you
+        Here is the email on file:
+      </Text>
+      <Text style={styles.regularText}>
+        {displayEmail}
       </Text>
       <TextInput
           style={styles.inputBox}
@@ -152,7 +187,24 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  pageContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  topnavContainer: {
+    height: 46,
+    marginHorizontal: 25,
+    marginBottom: 8,
+  },
+  descriptionContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  inputContainer: {
     flex: 1,
     backgroundColor: '#fff',
   },
@@ -166,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   regularText: {
-    fontSize: 22,
+    fontSize: 16,
     padding: 20,
     marginVertical: 8,
     color: 'black',

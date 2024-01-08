@@ -46,8 +46,8 @@ export default function App() {
 
   // == DATA STEP A ==
   // *fetchData* grabs all the data from the API_URL and loads it to a variable called "fetchdata".
-  // As a part of the process it transforms the JSON field called "title" to a field called "category". 
-  // Ref: Coursera Note - 1. Implement this function
+  // The method "response.json()" converts the JSON into a object variable called "json".
+  // As a part of the process it transforms the field called "title" to a field called "category". 
     const fetchData = async() => {
     try {
       const response = await fetch(API_URL);
@@ -66,7 +66,8 @@ export default function App() {
     }
   };    
   
-// == DATA STEP B: Convert fetchData's parsed JSON object to 'menuItems' (only if the SQL data pull, getMenuItems, comes up empty) ==
+// == DATA STEP B ==
+// Convert fetchData's parsed JSON object to 'menuItems' (only if the SQL data pull, getMenuItems, comes up empty) ==
 // The formatted data for SectionList, sectionListData, is assigned to the variable state, *data*.
 // useEffect to refresh menu data from SQLite data base...
 // but, if the SQLite database is empty, it loads it from the remote URL via the fetchdata function. 
