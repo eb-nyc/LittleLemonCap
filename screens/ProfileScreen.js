@@ -1,13 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, Text, StyleSheet, TextInput, Image, Pressable, Alert} from 'react-native';
 import { validateEmail } from '../utils';
+import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function OnboardingScreen() {
+export default function ProfileScreen() {
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
   const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
   const emailInputRef = React.createRef();   //Ref to store reference to TextInput component
   const pressableInputRef = React.createRef(); //Ref to store reference to current Pressable
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const [userProfile, setUserProfile] = useState([]);
+
+  // Function to transfer device's userprofile data from AsyncStorage to userprofile variable, if any exists.
+  // This is only done once when this component first renders.
+  useEffect(() => {
+    (async () => {
+        try {
+            const userPofile = await AsyncStorage.getItem('userProfile');
+            setUserProfile(userProfile === null? [] : JSON.parse(userProfile));
+        } catch (e) {}   
+    })();
+  }, []);
+
+  // Function to save new user-provided info to the user profile array saved to AsyncStorage
+  useEffect(() => {
+    (async () => {
+        try {
+            await AsyncStorage.mergeItem('userProfile', JSON.stringify(userProfile));
+        } catch (e) {}   
+    })();
+  }, [userProfile, email]);
+
+  // Function to load up the necessary fonts
+  useEffect(() => {
+    async function loadFont() {
+      await Font.loadAsync({
+        'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
+        'Karla': require('../assets/fonts/Karla.ttf'),
+      });
+      setFontLoaded(true);
+    }
+    loadFont();
+  }, []);
+  if (!fontLoaded) {
+    return null; // or a I can insert a loading indicator graphic here
+  }
 
   // function to remove the keyboard - used when valid email address is submitted
   const dismissKeyboard = () => {
@@ -25,6 +64,7 @@ export default function OnboardingScreen() {
     setSubscribed(true); 
     dismissKeyboard(); 
     onChangeEmail(''); 
+    setUserProfile(userProfile.email, email);
   };
 
   // function to alert user that their email address as been updated with the submitted email
@@ -35,7 +75,8 @@ export default function OnboardingScreen() {
     onChangeEmail(''); 
   }
 
-  // function to determine which prompt should be presented to user depending text in the input area is a valid email and if an email was already provided
+  // function to determine which prompt should be presented to user depending if text in the input area  
+  // is a valid email (validEmail) and if an email was already provided (subscribed).
   const processEmailSubmission = () => {
     {(!validEmail && !subscribed) && (
       handleInvalidEmail() )}
@@ -54,7 +95,8 @@ export default function OnboardingScreen() {
     onChangeEmail(enteredEmail);
   };
 
-  // four(4) conditions are evaluated to determine what functions are performed when the Pressable is activated. 
+  // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
+  // to determine what functions are performed when the Pressable is activated. 
   return (
     <>
     <View style={styles.container}>
@@ -65,14 +107,17 @@ export default function OnboardingScreen() {
         accessible={true}
         accessibilityLabel={'Little Lemon alternate grey logo'}
       />
+      <Text style={styles.subtitleMarkazi}>
+        Here is the email on file:
+      </Text>
       <Text style={styles.regularText}>
-        Subscribe to our newsletter for our latest delicious recipes!
+        {userProfile.email}
       </Text>
       <TextInput
           style={styles.inputBox}
           value={email}
           onChangeText={reviewEmailEntry}
-          placeholder={'Type your email'}
+          placeholder={''}
           keyboardType='email-address'
           clearButtonMode='while-editing'
           autoCapitalize='none'
@@ -144,10 +189,26 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   regularText: {
-    fontSize: 22,
+    fontSize: 16,
     padding: 20,
     marginVertical: 8,
     color: 'black',
+    textAlign: 'center',
+  },
+  regularKarla: {
+    fontSize: 22,
+    fontFamily: "Karla",
+    padding: 20,
+    marginVertical: 8,
+    color: 'black',
+    textAlign: 'center',
+  },
+  subtitleMarkazi: {
+    fontSize: 40,
+    fontFamily: "MarkaziText",
+    padding: 10,
+    marginVertical: 8,
+    color: '#48742C',
     textAlign: 'center',
   },
   inputBox: {
