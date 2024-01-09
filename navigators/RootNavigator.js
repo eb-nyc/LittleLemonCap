@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   return (
-      <Stack.Navigator initialRouteName="Onboarding">
+      <Stack.Navigator initialRouteName="Loyalty Club">
           <Stack.Screen 
           name="Loyalty Club" 
           component={OnboardingScreen}

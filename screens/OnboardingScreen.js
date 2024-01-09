@@ -5,7 +5,7 @@ import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function OnboardingScreen() {
+export default function OnboardingScreen({navigation}) {
 
 // GENERAL SCREEN VARIABLES
   const pressableInputRef = useRef(); //Ref to store reference to current Pressable
@@ -141,19 +141,21 @@ const saveUserEmail = async () => {
 
   // function to alert user that the submitted information has been accepted
   const handleNewSubscription = () => {
-    Alert.alert(`Welcome to the Club!`); 
+//    Alert.alert(`Welcome to the Club!`); 
     setSubscribed(true); 
     dismissKeyboard(); 
     saveUserEmail();
+    navigation.navigate('Profile');
     //onChangeEmail(''); 
     };
 
   // function to alert user that their email address as been updated with the submitted email
   const handleEmailUpdate = () => {
-    Alert.alert(`Thank you\nYour info has been updated.`); 
+//    Alert.alert(`Thank you\nYour info has been updated.`); 
     setSubscribed(true); 
     dismissKeyboard(); 
     saveUserEmail();
+    navigation.navigate('Profile');
     //onChangeEmail(''); 
     }
 
@@ -334,7 +336,7 @@ const saveUserEmail = async () => {
           onPress={handleInvalidEmail}
           hitSlop={{top: 20, bottom: 20}}
           >
-            <Text style={styles.navigationButtonText}>Subscribe</Text>
+            <Text style={styles.navigationButtonText}>Next</Text>
           </Pressable>
         )}
 
@@ -343,7 +345,7 @@ const saveUserEmail = async () => {
               style={styles.validEmailButton}
               onPress={handleNewSubscription}
           >
-            <Text style={styles.navigationButtonText}>Subscribe</Text>
+            <Text style={styles.navigationButtonText}>Next</Text>
           </Pressable>
         )}
 
@@ -353,7 +355,7 @@ const saveUserEmail = async () => {
           onPress={handleInvalidEmail}
           hitSlop={{top: 20, bottom: 20}}
           >
-            <Text style={styles.navigationButtonText}>Subscribed</Text>
+            <Text style={styles.navigationButtonText}>Next</Text>
           </Pressable>
         )}
 
@@ -363,7 +365,7 @@ const saveUserEmail = async () => {
               onPress={handleEmailUpdate}
               hitSlop={{top: 20, bottom: 20}}
           >
-            <Text style={styles.navigationButtonText}>Update Information</Text>
+            <Text style={styles.navigationButtonText}>Next</Text>
           </Pressable>
         )}
       </View>

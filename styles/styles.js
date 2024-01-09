@@ -23,16 +23,16 @@ const styles = StyleSheet.create({
       marginHorizontal: 25,
     },
     formHeadContainer: {
-        flex: 1,
-        backgroundColor: '#fff',
+      flex: 1,
+      backgroundColor: '#fff',
     },
     formInputContainer: {
       flex: 4,
       backgroundColor: '#fff',
     },
     formButtonContainer: {
-        flex: 1,
-        marginHorizontal: 25,
+      flex: 1,
+      alignItems: 'center',
       },
   
 
@@ -82,10 +82,11 @@ const styles = StyleSheet.create({
         textAlign: 'left',
       },
     navigationButtonText: {
+        fontSize: 40,
+        fontFamily: "MarkaziText",
         textAlign: 'center',
-        fontWeight: 'normal',
-        fontSize: 16,
-        color: 'white',
+        fontWeight: 'bold',
+        color: 'black',
       }, 
     
 // ELEMENTS
@@ -100,16 +101,19 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
     },
     validEmailButton: {
-      paddingHorizontal: 60,
-      paddingVertical: 6,
+      height: 51,
+      width: '100%',
+//      paddingHorizontal: 60,
+//      paddingVertical: 6,
       marginVertical: 16,
-      margin: 10,
-      backgroundColor: '#495E57',
-      borderColor: '#495E57',
+//      marginHorizontal: 25,
+      backgroundColor: '#F4CE14',
+      borderColor: '#F4CE147',
       borderWidth: 0,
       borderRadius: 10
     }, 
     invalidEmailButton: {
+      height: 51,
       paddingHorizontal: 60,
       paddingVertical: 6,
       marginVertical: 16,
