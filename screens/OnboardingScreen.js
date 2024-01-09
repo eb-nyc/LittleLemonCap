@@ -1,21 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View, Text, StyleSheet, TextInput, Image, Pressable, Alert} from 'react-native';
-import { validateEmail } from '../utils';
+import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform} from 'react-native';
+import { validateEmail, validateName } from '../utils';
+import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OnboardingScreen() {
+
+// GENERAL SCREEN VARIABLES
+  const pressableInputRef = useRef(); //Ref to store reference to current Pressable
+  const [fontLoaded, setFontLoaded] = useState(false);
+// ALL VARIABLES RELATED TO THE EMAIL ADDRESS
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
   const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
   const emailInputRef = useRef();   //Ref to store reference to TextInput component
-  const pressableInputRef = useRef(); //Ref to store reference to current Pressable
-  const [fontLoaded, setFontLoaded] = useState(false);
   const [displayEmail, setDisplayEmail] = useState('');
+// ALL VARIABLES RELATED TO THE FIRST NAME
+  const [firstName, onChangeFirstName] = useState(''); //variable state = email text string submitted by user into TextInput
+  const [validFirstName, setValidFirstName] = useState(false); //variable state = if text in input field is a valid format per validateName function
+  const firstNameInputRef = useRef();   //Ref to store reference to TextInput component
+  const [displayFirstName, setDisplayFirstName] = useState('');
+// ALL VARIABLES RELATED TO THE LAST NAME
+  const [lastName, onChangeLastName] = useState(''); //variable state = email text string submitted by user into TextInput
+  const [validLastName, setValidLastName] = useState(false); //variable state = if text in input field is a valid format per validateName function
+  const lastNameInputRef = useRef();   //Ref to store reference to TextInput component
+  const [displayLastName, setDisplayLastName] = useState('');
+
 
   // Function to transfer device's userprofile data from AsyncStorage to userprofile variable, if any exists.
-  // This is only done once when this component first renders.
-
+  // This is only done once when this component initially renders.
   const loadUserEmail = async () => {
     try {
       const userEmailString = await AsyncStorage.getItem('userEmail');
@@ -32,7 +46,43 @@ export default function OnboardingScreen() {
 }, []);
 
 
-  // Function to save new user-provided info to the user profile array saved to AsyncStorage
+  // Function to transfer device's userFirstName data from AsyncStorage to firstName variable, if any exists.
+  // This is only done once when this component initially renders.
+  const loadFirstName = async () => {
+    try {
+      const userFirstNameString = await AsyncStorage.getItem('userFirstName');
+      if (userFirstNameString !== null) {
+        onChangeFirstName(userFirstNameString);
+        setDisplayFirstName(userFirstNameString);
+      }
+    } catch (e) {
+      console.error(`Error loading first name from AsyncStorage: `, e);
+    }
+  };
+  useEffect(() => {
+    loadFirstName();
+  }, []);
+
+
+  // Function to transfer device's userLastName data from AsyncStorage to lastName variable, if any exists.
+  // This is only done once when this component first renders.
+  const loadLastName = async () => {
+    try {
+      const userLastNameString = await AsyncStorage.getItem('userLastName');
+      if (userLastNameString !== null) {
+        onChangeLastName(userLastNameString);
+        setDisplayLastName(userLastNameString);
+      }
+    } catch (e) {
+      console.error(`Error loading last name from AsyncStorage: `, e);
+    }
+  };
+  useEffect(() => {
+    loadLastName();
+  }, []);
+
+
+  // Function to save new user-provided email to the user profile array saved to AsyncStorage
 const saveUserEmail = async () => {
     try {
     await AsyncStorage.setItem('userEmail', email);
@@ -41,6 +91,25 @@ const saveUserEmail = async () => {
     }
 };
 //useEffect(() => {saveUserEmail();}, [email]);
+
+
+  // Function to save new user-provided first name to the user profile array saved to AsyncStorage
+  const saveFirstName = async () => {
+    try {
+    await AsyncStorage.setItem('userFirstName', firstName);
+    } catch (e) {
+    console.error(`Error saving first name to AsyncStorage: `,e);
+    }
+  };
+
+  // Function to save new user-provided last name to the user profile array saved to AsyncStorage
+  const saveLastName = async () => {
+    try {
+    await AsyncStorage.setItem('userLastName', lastName);
+    } catch (e) {
+    console.error(`Error saving last name to AsyncStorage: `,e);
+    }
+  };
 
 
   // Function to load up the necessary fonts
@@ -69,7 +138,7 @@ const saveUserEmail = async () => {
     Alert.alert('Please provide a valid email address'); 
   };
 
-  // function to alert user that the submitted email address has been accepted
+  // function to alert user that the submitted information has been accepted
   const handleNewSubscription = () => {
     Alert.alert(`Thanks for subscribing.\nStay tuned!`); 
     setSubscribed(true); 
@@ -107,11 +176,65 @@ const saveUserEmail = async () => {
     onChangeEmail(enteredEmail);
   };
 
+  // function to alert/prompt user to enter an email address with an acceptable format
+  const handleInvalidName = () => {
+    Alert.alert(`*Required*\nPlease provide a valid name`); 
+  };
+
+  // function to handle valid first name submission 
+  const handleFirstName = () => {
+    saveFirstName();
+    lastNameInputRef.current.focus();
+    };
+
+  // function to handle valid last name submission 
+  const handleLastName = () => {
+    saveLastName();
+    emailInputRef.current.focus();
+    };
+
+  // function to determine if text entered by user(enteredFirstName) is a valid format per <validateName> 
+  // and return true/false value for (validFirstName) and update the firstName variable state
+  const reviewFirstNameEntry = (enteredFirstName) => {
+    const firstNameIsValid = validateName(enteredFirstName);
+    setValidFirstName(firstNameIsValid);
+    onChangeFirstName(enteredFirstName);
+  };
+
+  // function to determine if text entered by user(enteredLastName) is a valid format per <validateName> 
+  // and return true/false value for (validLastName) and update the lastName variable state
+  const reviewLastNameEntry = (enteredLastName) => {
+    const lastNameIsValid = validateName(enteredLastName);
+    setValidLastName(lastNameIsValid);
+    onChangeLastName(enteredLastName);
+  };
+
+  // function to determine which prompt should be presented to user depending if text in the input area  
+  // is a valid name (validFirstName of validLastName).
+  const processFirstNameSubmission = () => {
+    if (!validFirstName) {
+      handleInvalidName();
+    } else { 
+      handleFirstName();
+  }};
+  
+  // function to determine which prompt should be presented to user depending if text in the input area  
+  // is a valid name (validFirstName of validLastName).
+  const processLastNameSubmission = () => {
+    if (!validLastName) {
+      handleInvalidName();
+    } else { 
+      handleLastName();
+  }};
+  
   // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
   // to determine what functions are performed when the Pressable is activated. 
   return (
-    <>
-    <View style={styles.pageContainer}>
+    <KeyboardAvoidingView 
+      style={styles.pageContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+//      keyboardVerticalOffset={5} // Add 5 pixels of space between keyboard and content
+    >
       <Image
         style={styles.image}
         source={require('../assets/little-lemon-logo-grey.png')}
@@ -119,161 +242,106 @@ const saveUserEmail = async () => {
         accessible={true}
         accessibilityLabel={'Little Lemon alternate grey logo'}
       />
-      <Text style={styles.subtitleMarkazi}>
-        Here is the email on file:
-      </Text>
       <Text style={styles.regularText}>
+        {displayFirstName} {displayLastName} {'\n'}
         {displayEmail}
       </Text>
-      <TextInput
-          style={styles.inputBox}
-          value={email}
-          onChangeText={reviewEmailEntry}
-          placeholder={''}
-          keyboardType='email-address'
-          clearButtonMode='while-editing'
-          autoCapitalize='none'
-          autoCorrect={false}
-          enterKeyHint='send'
-          onSubmitEditing={processEmailSubmission}
-          ref={emailInputRef}
-        />
 
-      {(!validEmail && !subscribed) && ( 
-      <Pressable 
-      ref={pressableInputRef}
-      style={styles.invalidEmailButton}
-      onPress={handleInvalidEmail}
-      hitSlop={{top: 20, bottom: 20}}
-      >
-        <Text style={styles.navigationButtonText}>Subscribe</Text>
-      </Pressable>
-      )}
+      <View style={styles.formContainer}>
+        <View style={styles.formheadContainer}> 
+          <Text style={styles.subtitleMarkazi}>
+            Let us get to know you
+          </Text>
+        </View>
 
-      {(validEmail && !subscribed) && ( 
-      <Pressable 
-          style={styles.validEmailButton}
-          onPress={handleNewSubscription}
-      >
-        <Text style={styles.navigationButtonText}>Subscribe</Text>
-      </Pressable>
-      )}
+        <View style={styles.inputContainer}>
+        <Text style={styles.cardtitleKarla}>First Name:</Text> 
+        <TextInput
+            style={styles.inputBox}
+            value={firstName}
+            onChangeText={reviewFirstNameEntry}
+            placeholder={''}
+            keyboardType='default'
+            clearButtonMode='while-editing'
+            autoCapitalize='words'
+            autoCorrect={false}
+            enterKeyHint='next'
+            onSubmitEditing={processFirstNameSubmission}
+            ref={firstNameInputRef}
+          />
+        <Text style={styles.cardtitleKarla}>Last Name:</Text> 
+        <TextInput
+            style={styles.inputBox}
+            value={lastName}
+            onChangeText={reviewLastNameEntry}
+            placeholder={''}
+            keyboardType='default'
+            clearButtonMode='while-editing'
+            autoCapitalize='words'
+            autoCorrect={false}
+            enterKeyHint='next'
+            onSubmitEditing={processLastNameSubmission}
+            ref={lastNameInputRef}
+          />
+        <Text style={styles.cardtitleKarla}>Email:</Text> 
+        <TextInput
+            style={styles.inputBox}
+            value={email}
+            onChangeText={reviewEmailEntry}
+            placeholder={''}
+            keyboardType='email-address'
+            clearButtonMode='while-editing'
+            autoCapitalize='none'
+            autoCorrect={false}
+            enterKeyHint='send'
+            onSubmitEditing={processEmailSubmission}
+            ref={emailInputRef}
+          />
+      </View>
+      </View>
 
-    {((!validEmail || email == '' || email == null) && subscribed) && ( 
-      <Pressable 
-      style={styles.invalidEmailButton}
-      onPress={handleInvalidEmail}
-      hitSlop={{top: 20, bottom: 20}}
-      >
-        <Text style={styles.navigationButtonText}>Subscribed</Text>
-      </Pressable>
-      )}
-
-    {(validEmail && !(email == '' || email == null) && subscribed) && ( 
-      <Pressable 
-          style={styles.validEmailButton}
-          onPress={handleEmailUpdate}
+      <View style={styles.botnavContainer}>
+        {(!validEmail && !subscribed) && ( 
+          <Pressable 
+          ref={pressableInputRef}
+          style={styles.invalidEmailButton}
+          onPress={handleInvalidEmail}
           hitSlop={{top: 20, bottom: 20}}
-      >
-        <Text style={styles.navigationButtonText}>Update Email Address</Text>
-      </Pressable>
-      )}
+          >
+            <Text style={styles.navigationButtonText}>Subscribe</Text>
+          </Pressable>
+        )}
 
+        {(validEmail && !subscribed) && ( 
+          <Pressable 
+              style={styles.validEmailButton}
+              onPress={handleNewSubscription}
+          >
+            <Text style={styles.navigationButtonText}>Subscribe</Text>
+          </Pressable>
+        )}
 
-    </View>
-    </>
+        {((!validEmail || email == '' || email == null) && subscribed) && ( 
+          <Pressable 
+          style={styles.invalidEmailButton}
+          onPress={handleInvalidEmail}
+          hitSlop={{top: 20, bottom: 20}}
+          >
+            <Text style={styles.navigationButtonText}>Subscribed</Text>
+          </Pressable>
+        )}
+
+        {(validEmail && !(email == '' || email == null) && subscribed) && ( 
+          <Pressable 
+              style={styles.validEmailButton}
+              onPress={handleEmailUpdate}
+              hitSlop={{top: 20, bottom: 20}}
+          >
+            <Text style={styles.navigationButtonText}>Update Email Address</Text>
+          </Pressable>
+        )}
+      </View>
+
+    </KeyboardAvoidingView>
   );
-
 }
-
-const styles = StyleSheet.create({
-  pageContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  topnavContainer: {
-    height: 46,
-    marginHorizontal: 25,
-    marginBottom: 8,
-  },
-  descriptionContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  formContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  inputContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 0,
-    alignSelf: 'center',
-    padding: 0,
-    marginTop: 35,
-    marginBottom: 5,
-  },
-  regularText: {
-    fontSize: 16,
-    padding: 20,
-    marginVertical: 8,
-    color: 'black',
-    textAlign: 'center',
-  },
-  regularKarla: {
-    fontSize: 22,
-    fontFamily: "Karla",
-    padding: 20,
-    marginVertical: 8,
-    color: 'black',
-    textAlign: 'center',
-  },
-  subtitleMarkazi: {
-    fontSize: 40,
-    fontFamily: "MarkaziText",
-    padding: 10,
-    marginVertical: 8,
-    color: '#48742C',
-    textAlign: 'center',
-  },
-  inputBox: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    fontSize: 16,
-    borderColor: 'black',
-    borderRadius: 6,
-    backgroundColor: 'white',
-  },
-  validEmailButton: {
-    paddingHorizontal: 60,
-    paddingVertical: 6,
-    marginVertical: 16,
-    margin: 10,
-    backgroundColor: '#495E57',
-    borderColor: '#495E57',
-    borderWidth: 0,
-    borderRadius: 10
-  }, 
-  invalidEmailButton: {
-    paddingHorizontal: 60,
-    paddingVertical: 6,
-    marginVertical: 16,
-    margin: 10,
-    backgroundColor: 'gray',
-    borderColor: 'gray',
-    borderWidth: 0,
-    borderRadius: 10
-  }, 
-  navigationButtonText: {
-    textAlign: 'center',
-    fontWeight: 'normal',
-    fontSize: 16,
-    color: 'white',
-  }, 
-});
