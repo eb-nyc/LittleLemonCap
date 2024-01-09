@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform} from 'react-native';
+import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, SafeAreaView, ScrollView} from 'react-native';
 import { validateEmail, validateName } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
@@ -36,6 +36,7 @@ export default function OnboardingScreen() {
       if (userEmailString !== null) {
         onChangeEmail(userEmailString);
         setDisplayEmail(userEmailString);
+        setValidEmail(true);
       }
     } catch (e) {
       console.error(`Error loading user profile: `, e);
@@ -54,6 +55,7 @@ export default function OnboardingScreen() {
       if (userFirstNameString !== null) {
         onChangeFirstName(userFirstNameString);
         setDisplayFirstName(userFirstNameString);
+        setValidFirstName(true);
       }
     } catch (e) {
       console.error(`Error loading first name from AsyncStorage: `, e);
@@ -72,6 +74,7 @@ export default function OnboardingScreen() {
       if (userLastNameString !== null) {
         onChangeLastName(userLastNameString);
         setDisplayLastName(userLastNameString);
+        setValidLastName(true);
       }
     } catch (e) {
       console.error(`Error loading last name from AsyncStorage: `, e);
@@ -90,8 +93,6 @@ const saveUserEmail = async () => {
     console.error(`Error saving user profile: `,e);
     }
 };
-//useEffect(() => {saveUserEmail();}, [email]);
-
 
   // Function to save new user-provided first name to the user profile array saved to AsyncStorage
   const saveFirstName = async () => {
@@ -140,20 +141,20 @@ const saveUserEmail = async () => {
 
   // function to alert user that the submitted information has been accepted
   const handleNewSubscription = () => {
-    Alert.alert(`Thanks for subscribing.\nStay tuned!`); 
+    Alert.alert(`Welcome to the Club!`); 
     setSubscribed(true); 
     dismissKeyboard(); 
     saveUserEmail();
-    onChangeEmail(''); 
+    //onChangeEmail(''); 
     };
 
   // function to alert user that their email address as been updated with the submitted email
   const handleEmailUpdate = () => {
-    Alert.alert(`Thank you\nYour email has been updated.`); 
+    Alert.alert(`Thank you\nYour info has been updated.`); 
     setSubscribed(true); 
     dismissKeyboard(); 
     saveUserEmail();
-    onChangeEmail(''); 
+    //onChangeEmail(''); 
     }
 
   // function to determine which prompt should be presented to user depending if text in the input area  
@@ -196,9 +197,14 @@ const saveUserEmail = async () => {
   // function to determine if text entered by user(enteredFirstName) is a valid format per <validateName> 
   // and return true/false value for (validFirstName) and update the firstName variable state
   const reviewFirstNameEntry = (enteredFirstName) => {
-    const firstNameIsValid = validateName(enteredFirstName);
-    setValidFirstName(firstNameIsValid);
-    onChangeFirstName(enteredFirstName);
+    if (enteredFirstName.length < firstName.length) {
+      const firstNameIsValid = validateName(firstName);
+      setValidFirstName(firstNameIsValid);
+    } else {
+      const firstNameIsValid = validateName(enteredFirstName);
+      setValidFirstName(firstNameIsValid);
+      onChangeFirstName(enteredFirstName);
+    }
   };
 
   // function to determine if text entered by user(enteredLastName) is a valid format per <validateName> 
@@ -226,6 +232,24 @@ const saveUserEmail = async () => {
     } else { 
       handleLastName();
   }};
+
+    // function to handle "return" key press on the email TextInput
+    const handleEmailReturn = () => {
+      reviewEmailEntry(email); // Validate the current email content
+      processEmailSubmission(); // Process the submission based on validation
+    };
+  
+    // function to handle "return" key press on the first name TextInput
+    const handleFirstNameReturn = () => {
+      reviewFirstNameEntry(firstName); // Validate the current first name content
+      processFirstNameSubmission(); // Process the submission based on validation
+    };
+  
+    // function to handle "return" key press on the last name TextInput
+    const handleLastNameReturn = () => {
+      reviewLastNameEntry(lastName); // Validate the current last name content
+      processLastNameSubmission(); // Process the submission based on validation
+    };
   
   // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
   // to determine what functions are performed when the Pressable is activated. 
@@ -233,7 +257,10 @@ const saveUserEmail = async () => {
     <KeyboardAvoidingView 
       style={styles.pageContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-//      keyboardVerticalOffset={5} // Add 5 pixels of space between keyboard and content
+      keyboardVerticalOffset={90} // Add pixels of space between keyboard and content
+    >
+    <ScrollView
+      style={styles.pageContainer}
     >
       <Image
         style={styles.image}
@@ -248,13 +275,13 @@ const saveUserEmail = async () => {
       </Text>
 
       <View style={styles.formContainer}>
-        <View style={styles.formheadContainer}> 
+        <View style={styles.formHeadContainer}> 
           <Text style={styles.subtitleMarkazi}>
             Let us get to know you
           </Text>
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={styles.formInputContainer}>
         <Text style={styles.cardtitleKarla}>First Name:</Text> 
         <TextInput
             style={styles.inputBox}
@@ -266,7 +293,7 @@ const saveUserEmail = async () => {
             autoCapitalize='words'
             autoCorrect={false}
             enterKeyHint='next'
-            onSubmitEditing={processFirstNameSubmission}
+            onSubmitEditing={handleFirstNameReturn}
             ref={firstNameInputRef}
           />
         <Text style={styles.cardtitleKarla}>Last Name:</Text> 
@@ -280,7 +307,7 @@ const saveUserEmail = async () => {
             autoCapitalize='words'
             autoCorrect={false}
             enterKeyHint='next'
-            onSubmitEditing={processLastNameSubmission}
+            onSubmitEditing={handleLastNameReturn}
             ref={lastNameInputRef}
           />
         <Text style={styles.cardtitleKarla}>Email:</Text> 
@@ -294,13 +321,12 @@ const saveUserEmail = async () => {
             autoCapitalize='none'
             autoCorrect={false}
             enterKeyHint='send'
-            onSubmitEditing={processEmailSubmission}
+            onSubmitEditing={handleEmailReturn}
             ref={emailInputRef}
           />
       </View>
-      </View>
 
-      <View style={styles.botnavContainer}>
+      <View style={styles.formButtonContainer}>
         {(!validEmail && !subscribed) && ( 
           <Pressable 
           ref={pressableInputRef}
@@ -337,11 +363,13 @@ const saveUserEmail = async () => {
               onPress={handleEmailUpdate}
               hitSlop={{top: 20, bottom: 20}}
           >
-            <Text style={styles.navigationButtonText}>Update Email Address</Text>
+            <Text style={styles.navigationButtonText}>Update Information</Text>
           </Pressable>
         )}
       </View>
 
+      </View>
+    </ScrollView>
     </KeyboardAvoidingView>
   );
 }

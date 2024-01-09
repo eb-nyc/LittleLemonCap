@@ -18,19 +18,19 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
     },
     formContainer: {
-      flex: 4,
+      flex: 5,
       backgroundColor: '#fff',
       marginHorizontal: 25,
     },
-    formheadContainer: {
-        flex: 0.2,
+    formHeadContainer: {
+        flex: 1,
         backgroundColor: '#fff',
     },
-    inputContainer: {
-      flex: .8,
+    formInputContainer: {
+      flex: 4,
       backgroundColor: '#fff',
     },
-    botnavContainer: {
+    formButtonContainer: {
         flex: 1,
         marginHorizontal: 25,
       },
