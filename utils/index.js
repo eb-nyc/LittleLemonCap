@@ -6,6 +6,21 @@ export const validateEmail = (enteredEmail) => {
 };
 
 
+// Purpose of function is to validate user-entered name
+export const validateName = (enteredName) => {
+  // Regular expression to match alphabetic letters, dashes, and periods
+  const nameRegex = /^[a-zA-Z.\-]+$/;
+
+  // Check if the enteredName matches the specified criteria
+  const isValidName =
+    enteredName.length >= 2 &&
+    enteredName.length <= 25 &&
+    nameRegex.test(enteredName);
+
+  return isValidName;
+};
+
+
 // Purpose of function seems only to determine if this component is rendering for the first time or not.
 export function useUpdateEffect(effect, dependencies = []) {
   const isInitialMount = useRef(true);
