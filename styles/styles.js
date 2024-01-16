@@ -4,7 +4,13 @@ import {StyleSheet} from 'react-native';
 const styles = StyleSheet.create({
 
 // CONTAINERS
-  pageContainer: {
+    splashContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+      pageContainer: {
       flex: 1,
       backgroundColor: '#fff',
     },
@@ -23,21 +29,27 @@ const styles = StyleSheet.create({
       marginHorizontal: 25,
     },
     formHeadContainer: {
-        flex: 1,
-        backgroundColor: '#fff',
+      flex: 1,
+      backgroundColor: '#fff',
     },
     formInputContainer: {
       flex: 4,
       backgroundColor: '#fff',
     },
     formButtonContainer: {
-        flex: 1,
-        marginHorizontal: 25,
+      flex: 1,
+      alignItems: 'center',
       },
   
 
 // IMAGES
-    image: {
+    splashLogo: {
+        width: 300,
+        borderRadius: 0,
+        alignSelf: 'center',
+        marginBottom: 200,
+  },
+  image: {
       width: 120,
       height: 120,
       borderRadius: 0,
@@ -82,10 +94,11 @@ const styles = StyleSheet.create({
         textAlign: 'left',
       },
     navigationButtonText: {
+        fontSize: 40,
+        fontFamily: "MarkaziText",
         textAlign: 'center',
-        fontWeight: 'normal',
-        fontSize: 16,
-        color: 'white',
+        fontWeight: 'bold',
+        color: 'black',
       }, 
     
 // ELEMENTS
@@ -99,17 +112,20 @@ const styles = StyleSheet.create({
       borderRadius: 6,
       backgroundColor: 'white',
     },
-    validEmailButton: {
-      paddingHorizontal: 60,
-      paddingVertical: 6,
+    validButton: {
+      height: 51,
+      width: '100%',
+//      paddingHorizontal: 60,
+//      paddingVertical: 6,
       marginVertical: 16,
-      margin: 10,
-      backgroundColor: '#495E57',
-      borderColor: '#495E57',
+//      marginHorizontal: 25,
+      backgroundColor: '#F4CE14',
+      borderColor: '#F4CE147',
       borderWidth: 0,
       borderRadius: 10
     }, 
-    invalidEmailButton: {
+    invalidButton: {
+      height: 51,
       paddingHorizontal: 60,
       paddingVertical: 6,
       marginVertical: 16,
