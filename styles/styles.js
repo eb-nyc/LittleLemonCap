@@ -4,7 +4,13 @@ import {StyleSheet} from 'react-native';
 const styles = StyleSheet.create({
 
 // CONTAINERS
-  pageContainer: {
+    splashContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+      pageContainer: {
       flex: 1,
       backgroundColor: '#fff',
     },
@@ -37,7 +43,13 @@ const styles = StyleSheet.create({
   
 
 // IMAGES
-    image: {
+    splashLogo: {
+        width: 300,
+        borderRadius: 0,
+        alignSelf: 'center',
+        marginBottom: 200,
+  },
+  image: {
       width: 120,
       height: 120,
       borderRadius: 0,
@@ -100,7 +112,7 @@ const styles = StyleSheet.create({
       borderRadius: 6,
       backgroundColor: 'white',
     },
-    validEmailButton: {
+    validButton: {
       height: 51,
       width: '100%',
 //      paddingHorizontal: 60,
@@ -112,7 +124,7 @@ const styles = StyleSheet.create({
       borderWidth: 0,
       borderRadius: 10
     }, 
-    invalidEmailButton: {
+    invalidButton: {
       height: 51,
       paddingHorizontal: 60,
       paddingVertical: 6,
