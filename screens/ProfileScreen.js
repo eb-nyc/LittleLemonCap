@@ -4,8 +4,9 @@ import { validateEmail, validateName } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({navigation}) {
 
 // GENERAL SCREEN VARIABLES
   const pressableInputRef = useRef(); //Ref to store reference to current Pressable
@@ -27,6 +28,16 @@ export default function ProfileScreen() {
   const lastNameInputRef = useRef();   //Ref to store reference to TextInput component
   const [displayLastName, setDisplayLastName] = useState('');
 
+    // Troubleshooting function to report when the Profile screen loads.
+    // Unsubscribes (doesn't report) when the Profile screen is unmounted.
+      // Subscribe to the event when the component is mounted
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      console.log('ProfileScreen focused');
+    });
+    // Cleanup function to unsubscribe from the focus event
+    // return () => {
+    //   unsubscribeFocus();
+    // };
 
   // Function to transfer device's userprofile data from AsyncStorage to userprofile variable, if any exists.
   // This is only done once when this component initially renders.
@@ -254,6 +265,7 @@ const saveUserEmail = async () => {
   // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
   // to determine what functions are performed when the Pressable is activated. 
   return (
+    unsubscribeFocus(),
     <KeyboardAvoidingView 
       style={styles.pageContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -262,6 +274,9 @@ const saveUserEmail = async () => {
     <ScrollView
       style={styles.pageContainer}
     >
+      <Text style={styles.sectionTitleKarla}>
+        PROFILE INFORMATION
+      </Text>
       <Image
         style={styles.image}
         source={require('../assets/little-lemon-logo-grey.png')}
