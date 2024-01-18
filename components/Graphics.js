@@ -109,12 +109,10 @@ if (avatarOnFile) {
 
   
 export const HeaderButtons = () => {
-    const navigation = useNavigation();
     console.log('HeaderButtons component is rendering on Profile Page.');
     return (
         <View style={styles.headerRightContainer}>
             <NameAbbreviation />
-            <Pressable onPress={() => navigation.navigate('Profile')}>
                 <Image
                     source={require('../assets/shoppingbag-bw.png')}
                     style={styles.headerButton}
@@ -122,7 +120,23 @@ export const HeaderButtons = () => {
                     accessible={true}
                     accessibilityLabel={'Shopping Bag'}
                 />
-            </Pressable>
         </View>
+    );
+  };
+
+  export const LogoBackButton = () => {
+    const navigation = useNavigation();
+    return (
+//        <View style={styles.headerRightContainer}>
+            <Pressable onPress={navigation.goBack}>
+                <Image
+                    source={require('../assets/logo-backbutton.png')}
+                    style={styles.logoBackButton}
+                    resizeMode="contain"
+                    accessible={true}
+                    accessibilityLabel={'Back Button'}
+                />
+            </Pressable>
+//        </View>
     );
   };

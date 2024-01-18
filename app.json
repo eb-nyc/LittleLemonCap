@@ -31,9 +31,16 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/Karla.ttf",
-            "./assets/fonts/MarkaziText.ttf"
+            "./assets/fonts/Karla-var.ttf",
+            "./assets/fonts/MarkaziText-var.ttf"
           ]
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Customize your avatar image with your own photo.",
+          "cameraPermission": "Take a quick selfie to create your own custom avatar!"
         }
       ]
     ]
