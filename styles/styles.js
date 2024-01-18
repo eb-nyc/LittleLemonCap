@@ -65,10 +65,15 @@ const styles = StyleSheet.create({
       flex: 4,
       backgroundColor: '#fff',
     },
+    avatarEditContainer: {
+      marginHorizontal: 25,    },
+      justifyContent: 'center',
+    profileInputContainer: {
+      marginHorizontal: 25,    },
     formButtonContainer: {
       flex: 1,
       alignItems: 'center',
-      },
+    },
   
 
 // IMAGES
@@ -92,6 +97,14 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         marginLeft: 0,
         marginRight: 30,
+        marginBottom: 11,
+    },
+    logoBackButton: {
+        height: 40,
+        width: 169,
+        borderRadius: 0,
+        marginLeft: 0,
+        marginRight: 0,
         marginBottom: 11,
     },
     image: {
@@ -144,7 +157,7 @@ const styles = StyleSheet.create({
         paddingTop: 4,
         paddingBottom: 4,
         marginVertical: 0,
-        fontWeight: 'bold',
+        fontWeight: '900',
         color: 'black',
         textAlign: 'center',
     },

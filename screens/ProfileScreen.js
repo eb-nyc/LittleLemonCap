@@ -4,7 +4,69 @@ import { validateEmail, validateName } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
+
+export const DisplayAvatar = () => {
+  const [avatarOnFile, setAvatarOnFile] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(null);
+//  const ChangeButtonRef = useRef(); //Ref to store reference to current Pressable
+
+// Function to transfer device's user image from AsyncStorage to a variable.
+// This is only done once when this component initially renders.
+useEffect(() => {
+  const loadUserAvatar = async () => {
+  try {
+    const userAvatarImage = await AsyncStorage.getItem('userImage');
+    if (userAvatarImage !== null) {
+      console.log('User image found in AsyncStorage.');
+      setAvatarOnFile(true);
+      setUserAvatar(userAvatarImage);
+    } else {
+      console.log('User image was NOT found in AsyncStorage.');
+      setAvatarOnFile(false);
+    }
+  } catch (e) {
+    console.error(`Error loading user image: `, e);
+  }
+};
+  loadUserAvatar();
+}, []);
+
+
+  // Function to save user image to AsyncStorage as {userImage}.
+  const userAvatarImage = async () => {
+    try {
+    await AsyncStorage.setItem('userImage', userAvatar);
+    } catch (e) {
+    console.error(`Error saving userAvatar to AsyncStorage: `,e);
+    }
+  };
+
+// Display avatar image.
+if (avatarOnFile) {
+  return (<View><Text>""</Text></View>);
+} else if (abbreviation) {
+  return (
+      <Pressable 
+      ref={pressableProfileRef}
+      style={styles.abbreviationContainer}
+      onPress={() => navigation.navigate('Profile')}
+      >
+          <Text style={styles.abbreviationKarla}>
+              {abbreviation}
+          </Text>
+      </Pressable>
+  ); 
+} else {
+  return (<View><Text>""</Text></View>);
+};  
+};
+
+
+
+
+
 
 export default function ProfileScreen({navigation}) {
 
@@ -28,16 +90,6 @@ export default function ProfileScreen({navigation}) {
   const lastNameInputRef = useRef();   //Ref to store reference to TextInput component
   const [displayLastName, setDisplayLastName] = useState('');
 
-    // Troubleshooting function to report when the Profile screen loads.
-    // Unsubscribes (doesn't report) when the Profile screen is unmounted.
-      // Subscribe to the event when the component is mounted
-    const unsubscribeFocus = navigation.addListener('focus', () => {
-      console.log('ProfileScreen focused');
-    });
-    // Cleanup function to unsubscribe from the focus event
-    // return () => {
-    //   unsubscribeFocus();
-    // };
 
   // Function to transfer device's userprofile data from AsyncStorage to userprofile variable, if any exists.
   // This is only done once when this component initially renders.
@@ -262,41 +314,36 @@ const saveUserEmail = async () => {
       processLastNameSubmission(); // Process the submission based on validation
     };
   
-  // Page layout elements including a Pressable button that casuses four(4) conditions to be evaluated 
-  // to determine what functions are performed when the Pressable is activated. 
+
+
+
+
+
+
+
+
+
+
+    
+
+  // ***  MAIN UI LAYOUT  *** 
   return (
-    unsubscribeFocus(),
     <KeyboardAvoidingView 
       style={styles.pageContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={90} // Add pixels of space between keyboard and content
     >
-    <ScrollView
-      style={styles.pageContainer}
-    >
+    <ScrollView style={styles.pageContainer}>
       <Text style={styles.sectionTitleKarla}>
         PROFILE INFORMATION
       </Text>
-      <Image
-        style={styles.image}
-        source={require('../assets/little-lemon-logo-grey.png')}
-        resizeMode="contain"
-        accessible={true}
-        accessibilityLabel={'Little Lemon alternate grey logo'}
-      />
-      <Text style={styles.regularText}>
-        {displayFirstName} {displayLastName} {'\n'}
-        {displayEmail}
-      </Text>
+      <View style={styles.avatarEditContainer}>
 
-      <View style={styles.formContainer}>
-        <View style={styles.formHeadContainer}> 
-          <Text style={styles.subtitleMarkazi}>
-            Let us get to know you
-          </Text>
-        </View>
+      </View>
+      <View style={styles.formInputContainer}>
 
-        <View style={styles.formInputContainer}>
+
+      <View style={styles.profileInputContainer}>
         <Text style={styles.cardtitleKarla}>First Name:</Text> 
         <TextInput
             style={styles.inputBox}

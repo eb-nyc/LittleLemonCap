@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import {HeaderBackButton} from "@react-navigation/elements";
 import HomeScreen from '../screens/HomeScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SplashScreen from '../screens/SplashScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HeaderLogo, HeaderButtons } from '../components/Graphics';
+import { HeaderLogo, HeaderButtons, LogoBackButton } from '../components/Graphics';
 import * as Font from 'expo-font';
 
 
@@ -71,25 +72,12 @@ else {
   return (
   <Stack.Navigator screenOptions={{
     orientation: 'portrait-up',
-    headerTitle: '',
-    headerLeft: () => <HeaderLogo />,
+    headerBackTitleVisible: false,
+    headerTitle: "",
+    headerLeft: () => <HeaderBackButton 
+      labelVisible={false} 
+      backImage={() => <LogoBackButton />} />,
     headerRight: () => <HeaderButtons />,
-    // headerLeftContainerStyle: {
-    //   padding: 0,
-    //   margin: 0,
-    //   flex: 0.5,
-    //   flexDirection: 'row',
-    //   alignItems: 'flex-start',
-    //   justifyContent: 'center',
-    // },
-  //  headerRightContainerStyle: {
-  //    padding: 0,
-  //    margin: 0,
-  //    flex: 1,
-  //    flexDirection: 'row',
-  //    alignItems: 'flex-end',
-  //    justifyContent: 'flex-end',
-  //  },
   }}>
     {isOnboardingCompleted ? (
       // Onboarding completed, user is signed in
@@ -97,6 +85,9 @@ else {
       <Stack.Screen 
         name="Home" 
         component={HomeScreen} 
+        options={{
+          headerLeft: () => <HeaderLogo />,
+        }}
       />
       <Stack.Screen 
         name="Profile" 
@@ -105,7 +96,13 @@ else {
       </>
     ) : (
       // User is NOT signed in
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      <Stack.Screen 
+        name="Onboarding" 
+        component={OnboardingScreen} 
+        options={{
+          headerLeft: () => <HeaderLogo />,
+        }}
+      />
     )}
   </Stack.Navigator>
   );
