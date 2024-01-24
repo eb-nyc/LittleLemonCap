@@ -1,11 +1,5 @@
 import { useRef, useEffect } from 'react';
 
-// Purpose of function is to validate user-entered email address
-export const validateEmail = (enteredEmail) => {
-  return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(enteredEmail);
-};
-
-
 // Purpose of function is to validate user-entered name
 export const validateName = (enteredName) => {
   // Regular expression to match alphabetic letters, dashes, and periods
@@ -18,6 +12,25 @@ export const validateName = (enteredName) => {
     nameRegex.test(enteredName);
 
   return isValidName;
+};
+
+
+// Purpose of function is to validate user-entered phone number
+export const validatePhone = (enteredPhone) => {
+    // Remove non-numeric characters from the input
+    const numericPhoneNumber = enteredPhone.replace(/\D/g, '');
+
+    // Check if the numeric phone number has exactly 10 digits
+    const isValidPhone =
+      numericPhoneNumber.length === 10;
+    
+    return isValidPhone;
+  };
+
+
+// Purpose of function is to validate user-entered email address
+export const validateEmail = (enteredEmail) => {
+  return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(enteredEmail);
 };
 
 

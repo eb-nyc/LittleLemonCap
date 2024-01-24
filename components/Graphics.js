@@ -109,7 +109,6 @@ if (avatarOnFile) {
 
   
 export const HeaderButtons = () => {
-    console.log('HeaderButtons component is rendering on Profile Page.');
     return (
         <View style={styles.headerRightContainer}>
             <NameAbbreviation />

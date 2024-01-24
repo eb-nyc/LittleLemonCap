@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
       marginBottom: 0,
       borderRadius: 0,
     },
-      pageContainer: {
+    pageContainer: {
       flex: 1,
       backgroundColor: '#fff',
     },
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
       marginHorizontal: 25,
       marginBottom: 8,
     },
-      descriptionContainer: {
+    descriptionContainer: {
       flex: 4,
       backgroundColor: '#fff',
     },
@@ -65,16 +65,43 @@ const styles = StyleSheet.create({
       flex: 4,
       backgroundColor: '#fff',
     },
+    cardTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'flex-start',
+      },
+    notificationOptionsContainer: {
+        height: 32,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'flex-start',
+    },
     avatarEditContainer: {
-      marginHorizontal: 25,    },
-      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    avatarButtonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+      },
     profileInputContainer: {
-      marginHorizontal: 25,    },
+      marginHorizontal: 25,    
+    },
     formButtonContainer: {
       flex: 1,
       alignItems: 'center',
     },
-  
+    notificationButtonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 50,
+        width: '100%',
+      },  
 
 // IMAGES
     splashLogo: {
@@ -116,6 +143,28 @@ const styles = StyleSheet.create({
       marginTop: 35,
       marginBottom: 5,
     },
+    blankAvatarContainer: {
+        width: 80,
+        height: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#EDEFEE',
+        marginRight: 10,
+        marginBottom: 0,
+        borderRadius: 40,
+      },
+      avatarImage: {
+    //    resizeMode: 'contain',
+      },
+    checkboxSize: {
+        width: 24,
+        height: 24,
+        borderRadius: 0,
+        alignSelf: 'center',
+        padding: 0,
+        marginRight: 8,
+    },
+  
 
 // FONTS
     regularText: {
@@ -151,12 +200,32 @@ const styles = StyleSheet.create({
         color: 'black',
         textAlign: 'left',
     },
+    cardcaptionKarla: {
+        fontSize: 12,
+        fontFamily: "Karla",
+        paddingTop: 4,
+        paddingBottom: 4,
+        marginVertical: 0,
+        fontWeight: 'normal',
+        color: 'red',
+        textAlign: 'left',
+    },
     sectionTitleKarla: {
         fontSize: 20,
         fontFamily: "Karla",
         paddingTop: 4,
         paddingBottom: 4,
-        marginVertical: 0,
+        marginVertical: 10,
+        fontWeight: '900',
+        color: 'black',
+        textAlign: 'center',
+    },
+    sectionTitleMarkazi: {
+        fontSize: 28,
+        fontFamily: "MarkaziText",
+        paddingTop: 4,
+        paddingBottom: 0,
+        marginVertical: 6,
         fontWeight: '900',
         color: 'black',
         textAlign: 'center',
@@ -179,11 +248,42 @@ const styles = StyleSheet.create({
         color: 'black',
         textAlign: 'center',
     },
+    notificationsKarla: {
+        fontSize: 16,
+        fontFamily: "Karla",
+        paddingBottom: 4,
+        marginVertical: 0,
+        fontWeight: 'normal',
+        color: 'black',
+        textAlign: 'left',
+    },
+    undoKarla: {
+        fontSize: 16,
+        fontFamily: "Karla",
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginVertical: 0,
+        alignSelf: 'center',
+        fontWeight: '900',
+        color: 'white',
+        textAlign: 'center',
+    },
+    logoutKarla: {
+        fontSize: 16,
+        fontFamily: "Karla",
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginVertical: 0,
+        alignSelf: 'center',
+        fontWeight: '900',
+        color: '#435F57',
+        textAlign: 'center',
+    },
     
 // ELEMENTS
     inputBox: {
       height: 40,
-      marginBottom: 14,
+      marginBottom: 12,
       borderWidth: 1,
       padding: 10,
       fontSize: 16,
@@ -194,27 +294,67 @@ const styles = StyleSheet.create({
     validButton: {
       height: 51,
       width: '100%',
-//      paddingHorizontal: 60,
-//      paddingVertical: 6,
       marginVertical: 16,
-//      marginHorizontal: 25,
       backgroundColor: '#F4CE14',
       borderColor: '#F4CE147',
       borderWidth: 0,
       borderRadius: 10
     }, 
     invalidButton: {
-      height: 51,
-      paddingHorizontal: 60,
-      paddingVertical: 6,
-      marginVertical: 16,
-      margin: 10,
-      backgroundColor: 'gray',
-      borderColor: 'gray',
-      borderWidth: 0,
-      borderRadius: 10
+        height: 51,
+        width: '100%',
+        marginVertical: 16,
+        margin: 10,
+        backgroundColor: '#EDEFEE',
+        borderColor: 'gray',
+        borderWidth: 0,
+        borderRadius: 10
     }, 
-  });
+    pressedButton: {
+        height: 51,
+        paddingHorizontal: 60,
+        paddingVertical: 6,
+        marginVertical: 16,
+        margin: 10,
+        backgroundColor: '#BEA00C',
+        borderColor: '#F4CE147',
+        borderWidth: 0,
+        borderRadius: 10
+      }, 
+    profileAvatarButton: {
+        height: 35,
+        width: 103,
+        marginHorizontal: 6,
+        backgroundColor: 'white',
+        borderColor: '#8B8B8B',
+        borderWidth: 1,
+        borderRadius: 8,
+        alignContent: 'center',
+        justifyContent: 'center',
+      }, 
+    notiUndoButton: {
+        height: 35,
+        width: 135,
+        marginHorizontal: 6,
+        backgroundColor: '#435F57',
+        borderColor: '#435F57',
+        borderWidth: 1,
+        borderRadius: 8,
+        alignContent: 'center',
+        justifyContent: 'center',
+      }, 
+    notiLogoutButton: {
+        height: 35,
+        width: 135,
+        marginHorizontal: 6,
+        backgroundColor: '#EDEFEE',
+        borderColor: '#435F57',
+        borderWidth: 1,
+        borderRadius: 8,
+        alignContent: 'center',
+        justifyContent: 'center',
+      }, 
+    });
 
   export default styles;
   

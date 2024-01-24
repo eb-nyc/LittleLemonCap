@@ -36,16 +36,15 @@ const [fontLoaded, setFontLoaded] = useState(false);
     const loadOnboardingCompleted = async () => {
     try {
       const userOnboardingCompleted = await AsyncStorage.getItem('userOnboarded');
-      console.log('Variable data from Async Storage:', userOnboardingCompleted);
       if (userOnboardingCompleted === 'true') {
-        console.log('userOnboardingCompleted = TRUE');
+        console.log('userOnboarded = TRUE');
         setIsOnboardingCompleted(true);
       } else {
-        console.log('userOnboardingCompleted = FALSE');
+        console.log('userOnboarded = FALSE');
         setIsOnboardingCompleted(false);
       }
     } catch (e) {
-      console.error(`Error loading user onboarding completed status: `, e);
+      console.error(`Error loading user onboarding completed status: `,e);
     } finally {
       setTimeout(() => {
         setIsLoading(false);
