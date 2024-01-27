@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import AuthContext from '../AuthContext';
 import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, SafeAreaView, ScrollView, Keyboard} from 'react-native';
 import { validateEmail, validateName, validatePhone } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AvatarPicker from '../utils/AvatarPicker';
 import HomeScreen from '../screens/HomeScreen';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
@@ -13,6 +15,7 @@ export default function ProfileScreen({navigation}) {
   // GENERAL SCREEN VARIABLES
     const pressableInputRef = useRef(); //Ref to store reference to current Pressable
     const [fontLoaded, setFontLoaded] = useState(false);
+    const { signOut } = useContext(AuthContext);
   // ALL VARIABLES RELATED TO THE AVATAR IMAGE MANAGMENT
     const [avatarOnFile, setAvatarOnFile] = useState(false);
     const [userAvatar, setUserAvatar] = useState(null);
@@ -47,35 +50,58 @@ export default function ProfileScreen({navigation}) {
 
 
 
-// Function to transfer userIMAGE from AsyncStorage when component renders.
-const loadUserAvatar = async () => {
-  try {
-    const userAvatarImage = await AsyncStorage.getItem('userImage');
-    if (userAvatarImage !== null) {
-      console.log(`userImage = `,userAvatar);
-      setAvatarOnFile(true);
-      setUserAvatar(userAvatarImage);
-    } else {
-      console.log(`userImage = NULL`);
-      setAvatarOnFile(false);
+  // Function to transfer userIMAGE from AsyncStorage when component renders.
+  const loadUserAvatar = async () => {
+    try {
+      const userAvatarURI = await AsyncStorage.getItem('userImage');
+      if (userAvatarURI) {
+        // setUserAvatar(userAvatarURI);
+        console.log(`Found userImage in AsyncStorage!`);
+        const parsedUserAvatar = JSON.parse(userAvatarURI);
+        console.log(`Parsed userImage loaded from AsyncStorage and saved as userAvatar.`);
+        setAvatarOnFile(true);
+        setUserAvatar(parsedUserAvatar);
+      } else {
+        console.log(`Unable to use loadUserAvatar to get userImage from AsyncStorage.`);
+        setAvatarOnFile(false);
+      }
+    } catch (e) {
+      console.error(`Error loading user image:`,e);
     }
-  } catch (e) {
-    console.error(`Error loading user image: `, e);
-  }
-};
-useEffect(() => {
-  loadUserAvatar();
-}, []);
+  };
+
+  useEffect(() => {
+    loadUserAvatar();
+    console.log(`-- useEffect (loadUserAvatar) --`);
+  }, []);
 
 
   // Function to save user image to AsyncStorage as {userImage}.
-  const saveAvatarImage = async () => {
+  const saveAvatarImage = async (imageURI) => {
     try {
-    await AsyncStorage.setItem('userImage', userAvatar);
+      await AsyncStorage.setItem('userImage', JSON.stringify(imageURI));
+      console.log(`Saving stringifyd version of imageURI to AsyncStorage.`);
     } catch (e) {
-    console.error(`Error saving userAvatar to AsyncStorage: `,e);
+      console.error(`Error saving userAvatar to AsyncStorage: `,e);
     }
   };
+
+
+  // Function to upload image from device
+  const handleChangeAvatar = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setUserAvatar(result.uri);
+      // Save the new image URI to AsyncStorage
+      saveAvatarImage(result.uri);
+    }
+  };
+
 
   // Function to remove user image from AsyncStorage
   const removeUserAvatar = async () => {
@@ -83,22 +109,70 @@ useEffect(() => {
       await AsyncStorage.removeItem('userImage');
       console.log('User image removed from AsyncStorage.');
       setAvatarOnFile(false);
-      setUserAvatar(null);
+      setUserAvatar(require('../assets/profile-ph.png'));
     } catch (e) {
       console.error('Error removing user image from AsyncStorage: ', e);
     }
   };
-
-  // Function to ask photo access permission then allow user to select a photo from device.
-  const ChangeAvatar = () => {};
-
-
-  // Function to delete the avatar image from the device and display.
-  const RemoveAvatar = () => {
-    setUserAvatar(null);
-    saveAvatarImage();
-    DisplayAvatar();
+  
+  // Function to display and save a default image for userAvatar.
+  const saveDefaultAvatar = () => {
+    setUserAvatar(require('../assets/profile-image.png'));
+    console.log('Message to confirm the saveDefaultAvatar function is running.');
   };
+  
+  useEffect(() => {
+    console.log(`useEffect -- saveUserAvatar(userAvatar) -- Saving userAvatar to AsyncStorage.`);
+    saveAvatarImage(userAvatar);
+  }, [userAvatar]);
+
+
+  // const saveDefaultAvatar = () => {
+  //   setUserAvatar('../assets/profile-image.png');
+  //   console.log('Message to confirm the saveDefaultAvatar function is running.');
+  //   console.log(userAvatar); // Log the value immediately after setting it
+  // };
+
+  // FORMER CODE
+  // const saveDefaultAvatar = async () => {
+  //     try {
+  //       setUserAvatar('../assets/profile-image.png');
+  //       console.log ('Message to confirm the saveDefaultAvatar function is running.');
+  //     } catch (e) {
+  //       console.error(`setUserAvatar Error. userAvatar not set because:`, e);
+  //     } finally {
+  //       setTimeout(() => {
+  //         console.log (userAvatar);
+  //     }, 1000);
+  //     }
+  // };
+      //console.log ('Message to confirm the saveDefaultAvatar function is running.')
+      // setUserAvatar('../assets/profile-image.png');
+      // console.log (userAvatar);
+
+
+  const loadDefaultAvatar = () => {
+    // Load the default avatar image
+    console.log ('Message to confirm the loadDefaultAvatar function is running.');
+    //setUserAvatar(require('../assets/profile-image.png'));
+    setUserAvatar('../assets/profile-image.png');
+    // saveAvatarImage();
+    // loadUserAvatar();
+  };
+
+  // Function to handle the "Change" button and show the alert
+  const changeAvatar = () => {
+    const showAlert = () => {
+      Alert.alert(
+        "Photo Selection Disabled",
+        "The mobile simulator didn't allow photo selection from the device, so this button just loads the provided profile picture.",
+        [{ text: "OK", onPress: saveDefaultAvatar }]
+        //[{ text: "OK", onPress: () => console.log('Confirm Change Button press works.') }]
+      );
+    };
+    showAlert();
+  };
+
 
 
   // Function to transfer device's user email from AsyncStorage when this component renders.
@@ -175,26 +249,68 @@ useEffect(() => {
 const saveUserEmail = async () => {
     try {
     await AsyncStorage.setItem('userEmail', email);
+    console.log(`AsyncStorage userEmail updated to`,email);
     } catch (e) {
-    console.error(`Error saving user profile: `,e);
+    console.error(`Error saving user email: `,e);
     }
 };
+
+  // Function to remove email from AsyncStorage
+  const removeEmail = async () => {
+    try {
+      await AsyncStorage.removeItem('userEmail');
+      console.log('User email removed from AsyncStorage.');
+      setValidEmail(false);
+      onChangeEmail('');
+    } catch (e) {
+      console.error('Error removing user email from AsyncStorage: ', e);
+    }
+  };
+
+
 
   // Function to save new user-provided first name to AsyncStorage
   const saveFirstName = async () => {
     try {
     await AsyncStorage.setItem('userFirstName', firstName);
+    console.log(`AsyncStorage userFirstName updated to`,firstName);
     } catch (e) {
     console.error(`Error saving first name to AsyncStorage: `,e);
     }
   };
 
+  // Function to remove first name from AsyncStorage
+  const removeFirstName = async () => {
+    try {
+      await AsyncStorage.removeItem('userFirstName');
+      console.log('User first name removed from AsyncStorage.');
+      setValidFirstName(false);
+      onChangeFirstName('');
+    } catch (e) {
+      console.error('Error removing user first name from AsyncStorage: ', e);
+    }
+  };
+
+
   // Function to save new user-provided last name to AsyncStorage
   const saveLastName = async () => {
     try {
     await AsyncStorage.setItem('userLastName', lastName);
+    console.log(`AsyncStorage userLastName updated to`,lastName);
     } catch (e) {
     console.error(`Error saving last name to AsyncStorage: `,e);
+    }
+  };
+
+  // Function to remove last name from AsyncStorage
+  const removeLastName = async () => {
+    try {
+      await AsyncStorage.removeItem('userLastName');
+      console.log('User last name removed from AsyncStorage.');
+      setValidLastName(false);
+      onChangeLastName('');
+    } catch (e) {
+      console.error('Error removing user last name from AsyncStorage: ', e);
     }
   };
 
@@ -203,10 +319,25 @@ const saveUserEmail = async () => {
   const savePhone = async () => {
     try {
     await AsyncStorage.setItem('userPhone', phone);
+    console.log(`AsyncStorage userPhone updated to`,phone);
     } catch (e) {
     console.error(`Error saving phone number to AsyncStorage: `,e);
     }
   };
+
+  // Function to remove phone number from AsyncStorage
+  const removePhone = async () => {
+    try {
+      await AsyncStorage.removeItem('userPhone');
+      console.log('User phone number removed from AsyncStorage.');
+      setValidPhone(false);
+      onChangePhone('');
+    } catch (e) {
+      console.error('Error removing user phone number from AsyncStorage: ', e);
+    }
+  };
+
+
 
   // function to determine if enteredPhone is a valid format per <validatePhone /> and return true/false value for {setValidPhone}.
   const reviewPhoneEntry = (enteredPhone) => {
@@ -246,7 +377,7 @@ const saveUserEmail = async () => {
   
 
 
-  // Function to load up the necessary fonts
+  // function to load up the necessary fonts
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
@@ -259,7 +390,7 @@ const saveUserEmail = async () => {
   }, []);
   if (!fontLoaded) {
     return null; // or a I can insert a loading indicator graphic here
-  }
+  }  
 
 
   // function to alert/prompt user to enter an email address with an acceptable format
@@ -272,7 +403,6 @@ const saveUserEmail = async () => {
     Alert.alert(`Welcome to the Club!`); 
     setSubscribed(true); 
     dismissKeyboard(); 
-    saveUserEmail();
     //onChangeEmail(''); 
     };
 
@@ -318,14 +448,14 @@ const saveUserEmail = async () => {
   // function to determine if text entered by user(enteredFirstName) is a valid format per <validateName> 
   // and return true/false value for (validFirstName) and update the firstName variable state
   const reviewFirstNameEntry = (enteredFirstName) => {
-    if (enteredFirstName.length < firstName.length) {
-      const firstNameIsValid = validateName(firstName);
-      setValidFirstName(firstNameIsValid);
-    } else {
+    // if (enteredFirstName.length < firstName.length) {
+    //   const firstNameIsValid = validateName(firstName);
+    //   setValidFirstName(firstNameIsValid);
+    // } else {
       const firstNameIsValid = validateName(enteredFirstName);
       setValidFirstName(firstNameIsValid);
       onChangeFirstName(enteredFirstName);
-    }
+    // }
   };
 
   // function to determine if text entered by user(enteredLastName) is a valid format per <validateName> 
@@ -391,47 +521,30 @@ const saveUserEmail = async () => {
   // function to manage all updates when Undo Changes button is pressed
   const undoChanges = () => {
       dismissKeyboard();
-      navigation.navigate('Profile');
+      loadUserAvatar();
+      loadFirstName();
+      loadLastName();
+      loadUserEmail();
+      loadPhone();
   };
 
   // Function to save change onboard status in AsyncStorage as {userOnboarded}.
-  const saveOnboardStatus = async (status) => {
-    try {
-        const statusString = JSON.stringify(status); // Convert to JSON string
-        await AsyncStorage.setItem('userOnboarded', statusString);
-    } catch (e) {
-        console.error(`Error saving new status to userOnboarded in AsyncStorage: `, e);
-    }
+  const saveOnboardStatus = async () => {
+    await signOut();
   };
 
   // function to manage all updates when Logout button is pressed
   const logout = () => {
     dismissKeyboard();
-
-    removeUserAvatar;
-
-    onChangeFirstName('');
-    setValidFirstName(false);
-    saveFirstName();
-
-    onChangeLastName('');
-    setValidLastName(false);
-    saveLastName();
-
-    onChangeEmail('');
-    setValidEmail(false);
-    saveUserEmail();
-
-    onChangePhone('');
-    setValidPhone(false);
-    savePhone();
-
+    removeUserAvatar();
+    removeFirstName();
+    removeLastName();
+    removeEmail();
+    removePhone();
     setOnboard(false);
-    saveOnboardStatus(onboard);
-
+    saveOnboardStatus();
     setTimeout(() => {
-      navigation.navigate('Onboarding');;
-    }, 300);
+    }, 1000);
   };
 
 
@@ -439,12 +552,12 @@ const saveUserEmail = async () => {
     // function to manage all updates when Save & Exit button is pressed
     const saveAndExit = () => {
         Keyboard.dismiss();;
-//        saveAvatarImage();
+        //saveAvatarImage(userAvatar);
         saveFirstName();
         saveLastName(); 
         saveUserEmail();
         savePhone();
-        navigation.navigate('Onboarding');
+        navigation.navigate('Home');
     };
 
     // function to alert/prompt user to enter an email address with an acceptable format
@@ -452,7 +565,8 @@ const saveUserEmail = async () => {
       Alert.alert('Valid email and first & last name are required.'); 
     };
 
-    
+    const testImageVar = require('../assets/profile-image.png');
+    const testImagePath = '../assets/shoppingbag-bw.png';
 
   // ***  MAIN UI LAYOUT  *** 
   return (
@@ -470,34 +584,32 @@ const saveUserEmail = async () => {
       </View>
       <View style={styles.avatarEditContainer}>
         <View style={styles.avatarButtonContainer}>
-          {avatarOnFile ? (
-            <View style={styles.blankAvatarContainer}>
               <Image
-                source={{ uri: userAvatar }}
-                resizeMode="cover"
+                style={styles.transparentAvatarContainer}
+                source={userAvatar}
+                resizeMode="contain"
                 accessible={true}
                 accessibilityLabel={'Avatar image of you!'}
               />
-            </View>
-          ) : (
-            <View style={styles.blankAvatarContainer} />
-          )}
+
           <Pressable 
             style={styles.profileAvatarButton}
-            // onPress={<ChangeAvatar />}
+            onPress={changeAvatar}
           >
             <Text style={styles.abbreviationKarla}>
                 Change
             </Text>
           </Pressable> 
+
           <Pressable 
             style={styles.profileAvatarButton}
-            // onPress={<RemoveAvatar />}
+            onPress={removeUserAvatar}
           >
             <Text style={styles.abbreviationKarla}>
                 Remove
             </Text>
-          </Pressable> 
+          </Pressable>
+           
         </View>
       </View>
 
@@ -620,7 +732,7 @@ const saveUserEmail = async () => {
 
           <Pressable 
             style={styles.notiUndoButton}
-            // onPress={<ChangeAvatar />}
+            onPress={undoChanges}
           >
             <Text style={styles.undoKarla}>
                 Undo Changes
@@ -635,7 +747,6 @@ const saveUserEmail = async () => {
             </Text>
           </Pressable> 
         </View>
-
 
 
   {/* Conditional formatting options for Main Button */}
