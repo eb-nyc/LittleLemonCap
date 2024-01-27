@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, SafeAreaView, ScrollView, Keyboard} from 'react-native';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import AuthContext from '../AuthContext';
+import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, ScrollView, Keyboard} from 'react-native';
 import { validateEmail, validateName } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
@@ -10,7 +11,7 @@ export default function OnboardingScreen({navigation}) {
 // GENERAL SCREEN VARIABLES
   const pressableInputRef = useRef(); //Ref to store reference to current Pressable
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [onboardedStatus, setOnboardedStatus] = useState(false);
+  const { signIn } = useContext(AuthContext);
 // ALL VARIABLES RELATED TO THE EMAIL ADDRESS
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
@@ -37,6 +38,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeFirstName(userFirstNameString);
         setDisplayFirstName(userFirstNameString);
         setValidFirstName(true);
+      } else {
+        onChangeFirstName('');
+        setDisplayFirstName('');
+        setValidFirstName(false);
       }
     } catch (e) {
       console.error(`Error loading first name from AsyncStorage: `, e);
@@ -66,6 +71,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeLastName(userLastNameString);
         setDisplayLastName(userLastNameString);
         setValidLastName(true);
+      } else {
+        onChangeLastName('');
+        setDisplayLastName('');
+        setValidLastName(false);
       }
     } catch (e) {
       console.error(`Error loading last name from AsyncStorage: `, e);
@@ -94,6 +103,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeEmail(userEmailString);
         setDisplayEmail(userEmailString);
         setValidEmail(true);
+      } else {
+        onChangeEmail('');
+        setDisplayEmail('');
+        setValidEmail(false);
       }
     } catch (e) {
       console.error(`Error loading user profile: `, e);
@@ -110,16 +123,6 @@ const saveUserEmail = async () => {
     console.log(`AsyncStorage record for {userEmail} updated to`,email);
     } catch (e) {
     console.error(`Error saving user profile: `,e);
-    }
-};
-
-  // Function to save onboarding status to AsyncStorage as {userOnboarded}
-  const saveOnboardedStatus = async () => {
-    try {
-    await AsyncStorage.setItem('userOnboarded', onboardedStatus.toString());
-    console.log(`AsyncStorage record for {userOnboarded} updated to`,onboardedStatus);
-    } catch (e) {
-    console.error(`Error saving user's onboarding status: `,e);
     }
 };
 
@@ -247,12 +250,12 @@ const saveUserEmail = async () => {
   }
     
   // function to execute steps when the "Next" button is used successfully
-  const handleNextButton = () => {
-      setOnboardedStatus(true); 
+  const handleNextButton = async () => {
       dismissKeyboard(); 
-      saveOnboardedStatus();
-      console.log(`onBoarded = `,onboardedStatus);
-      //navigation.navigate('Home');
+      saveFirstName();
+      saveLastName();
+      saveUserEmail();
+      await signIn();
   }
       
   

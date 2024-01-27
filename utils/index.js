@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Purpose of function is to validate user-entered name
 export const validateName = (enteredName) => {
@@ -69,3 +70,16 @@ export function useUpdateEffect(effect, dependencies = []) {
     return SECTION_LIST_MOCK_DATA;
   }
 
+
+  export const loadOnboardingCompleted = async () => {
+    try {
+      const userOnboardingCompleted = await AsyncStorage.getItem('userOnboarded');
+      return userOnboardingCompleted === 'true';
+    } catch (e) {
+      console.error(`Error loading user onboarding completed status: `, e);
+      return false;
+    } finally {
+      setTimeout(() => {
+      }, 1000);
+    }
+  };
