@@ -1,10 +1,5 @@
 import { useRef, useEffect } from 'react';
-
-// Purpose of function is to validate user-entered email address
-export const validateEmail = (enteredEmail) => {
-  return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(enteredEmail);
-};
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Purpose of function is to validate user-entered name
 export const validateName = (enteredName) => {
@@ -18,6 +13,25 @@ export const validateName = (enteredName) => {
     nameRegex.test(enteredName);
 
   return isValidName;
+};
+
+
+// Purpose of function is to validate user-entered phone number
+export const validatePhone = (enteredPhone) => {
+    // Remove non-numeric characters from the input
+    const numericPhoneNumber = enteredPhone.replace(/\D/g, '');
+
+    // Check if the numeric phone number has exactly 10 digits
+    const isValidPhone =
+      numericPhoneNumber.length === 10;
+    
+    return isValidPhone;
+  };
+
+
+// Purpose of function is to validate user-entered email address
+export const validateEmail = (enteredEmail) => {
+  return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(enteredEmail);
 };
 
 
@@ -56,3 +70,16 @@ export function useUpdateEffect(effect, dependencies = []) {
     return SECTION_LIST_MOCK_DATA;
   }
 
+
+  export const loadOnboardingCompleted = async () => {
+    try {
+      const userOnboardingCompleted = await AsyncStorage.getItem('userOnboarded');
+      return userOnboardingCompleted === 'true';
+    } catch (e) {
+      console.error(`Error loading user onboarding completed status: `, e);
+      return false;
+    } finally {
+      setTimeout(() => {
+      }, 1000);
+    }
+  };

@@ -5,15 +5,16 @@ import HomeScreen from '../screens/HomeScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SplashScreen from '../screens/SplashScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HeaderLogo, HeaderButtons, LogoBackButton } from '../components/Graphics';
+import { loadOnboardingCompleted } from '../utils';
 import * as Font from 'expo-font';
+import AuthContext from '../AuthContext';
 
 
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
-const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false); //variable to hold the name of the initial route name
+const { isOnboardingCompleted } = React.useContext(AuthContext); //Context hook variable for routing
 const [isLoading, setIsLoading] = useState(true);
 const [fontLoaded, setFontLoaded] = useState(false);
 
@@ -21,8 +22,8 @@ const [fontLoaded, setFontLoaded] = useState(false);
     useEffect(() => {
       async function loadFont() {
           await Font.loadAsync({
-          'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
-          'Karla': require('../assets/fonts/Karla.ttf'),
+          'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+          'Karla': require('../assets/fonts/Karla-var.ttf'),
           });
           setFontLoaded(true);
       };
@@ -33,27 +34,20 @@ const [fontLoaded, setFontLoaded] = useState(false);
   // Function to transfer device's user onboading completion status from AsyncStorage to a variable.
   // This is only done once when this component initially renders.
   useEffect(() => {
-    const loadOnboardingCompleted = async () => {
-    try {
-      const userOnboardingCompleted = await AsyncStorage.getItem('userOnboarded');
-      console.log('Variable data from Async Storage:', userOnboardingCompleted);
-      if (userOnboardingCompleted === 'true') {
-        console.log('userOnboardingCompleted = TRUE');
-        setIsOnboardingCompleted(true);
-      } else {
-        console.log('userOnboardingCompleted = FALSE');
-        setIsOnboardingCompleted(false);
+    const loadOnboarding = async () => {
+      try {
+        const userOnboardingCompleted = await loadOnboardingCompleted();
+        console.log(`loadingOnboarding: isOnboardingCompleted set to`, isOnboardingCompleted,`based on AsyncStorage.`);
+      } catch (e) {
+        console.error("Error loading onboarding status:", e);
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
       }
-    } catch (e) {
-      console.error(`Error loading user onboarding completed status: `, e);
-    } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-    }
-  };
-    loadOnboardingCompleted();
-}, []);
+    };
+    loadOnboarding();
+  }, []);
 
 
 if (isLoading) {
@@ -67,34 +61,37 @@ if (isLoading) {
         <Stack.Screen name="Splash Screen" component={SplashScreen} />
     </Stack.Navigator>
     );
-  }
-else {  
+  } else {  
   return (
-  <Stack.Navigator screenOptions={{
-    orientation: 'portrait-up',
-    headerBackTitleVisible: false,
-    headerTitle: "",
-    headerLeft: () => <HeaderBackButton 
-      labelVisible={false} 
-      backImage={() => <LogoBackButton />} />,
-    headerRight: () => <HeaderButtons />,
-  }}>
-    {isOnboardingCompleted ? (
-      // Onboarding completed, user is signed in
-      <>
-      <Stack.Screen 
-        name="Home" 
-        component={HomeScreen} 
-        options={{
-          headerLeft: () => <HeaderLogo />,
-        }}
-      />
-      <Stack.Screen 
-        name="Profile" 
-        component={ProfileScreen}
-      />
-      </>
-    ) : (
+    <Stack.Navigator screenOptions={{
+      orientation: 'portrait-up',
+      headerBackTitleVisible: false,
+      headerTitle: "",
+      headerLeft: () => <HeaderBackButton 
+        labelVisible={false} 
+        backImage={() => <LogoBackButton />} />,
+      // headerRight: () => <HeaderButtons />,
+    }}>
+      {isOnboardingCompleted ? (
+        // Onboarding completed, user is signed in
+        <>
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{
+            headerLeft: () => <HeaderLogo />,
+            headerRight: () => <HeaderButtons />,
+          }}
+        />
+        <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen}
+          options={{
+            headerRight: () => <HeaderButtons />, 
+          }}       
+        />
+        </>
+  ) : (
       // User is NOT signed in
       <Stack.Screen 
         name="Onboarding" 

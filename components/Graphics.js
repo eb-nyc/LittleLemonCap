@@ -4,6 +4,7 @@ import * as Font from 'expo-font';
 import styles from '../styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import {loadUserAvatar} from '../screens/ProfileScreen';
 
 export const HeaderLogo = () => {
   return (
@@ -29,8 +30,8 @@ export const NameAbbreviation = () => {
     useEffect(() => {
         async function loadFont() {
             await Font.loadAsync({
-            'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
-            'Karla': require('../assets/fonts/Karla.ttf'),
+            'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+            'Karla': require('../assets/fonts/Karla-var.ttf'),
             });
             setFontLoaded(true);
         };
@@ -39,11 +40,15 @@ export const NameAbbreviation = () => {
 
     // function to load abbreviations from Async userFirstName and userLastName
     const fetchNames = async () => {
+        let userFirstName;
+        let userLastName;
         try {
             // Retrieve userFirstName and userLastName from AsyncStorage
-            const userFirstName = await AsyncStorage.getItem('userFirstName');
-            const userLastName = await AsyncStorage.getItem('userLastName');
-
+            userFirstName = await AsyncStorage.getItem('userFirstName');
+            userLastName = await AsyncStorage.getItem('userLastName');
+        } catch (error) {
+            console.error('Error fetching data abbreviations from AsyncStorage:', error);
+        } finally {
             // Extract the first letter of userFirstName and the first letter of userLastName
             const firstLetter = userFirstName ? userFirstName.charAt(0) : '?';
             const secondLetter = userLastName ? userLastName.charAt(0) : '?';
@@ -53,8 +58,6 @@ export const NameAbbreviation = () => {
 
             // Update the state with the abbreviation
             setAbbreviation(abbreviationResult);
-        } catch (error) {
-            console.error('Error fetching data abbreviations from AsyncStorage:', error);
         };
     };
 
@@ -68,28 +71,22 @@ export const NameAbbreviation = () => {
   // Function to transfer device's user image from AsyncStorage to a variable.
   // This is only done once when this component initially renders.
   useEffect(() => {
-    const loadUserAvatar = async () => {
-    try {
-      const userAvatarImage = await AsyncStorage.getItem('userImage');
-      if (userAvatarImage !== null) {
-        console.log('User image found in AsyncStorage.');
-        setAvatarOnFile(true);
-        setUserAvatar(userAvatarImage);
-      } else {
-        console.log('User image was NOT found in AsyncStorage.');
-        setAvatarOnFile(false);
-      }
-    } catch (e) {
-      console.error(`Error loading user image: `, e);
-    }
-  };
-    loadUserAvatar();
+    loadUserAvatar;
 }, []);
 
 
 //Return the Text component with the abbreviation
-if (avatarOnFile) {
-    return (<View><Text>""</Text></View>);
+if (userAvatar) {
+    return (
+        <View style={styles.headerIconContainer}>
+            <Image
+                source={{ uri: userAvatar }}
+                resizeMode="contain"
+                accessible={true}
+                accessibilityLabel={'Avatar image of you!'}
+            />
+        </View>
+    );
 } else if (abbreviation) {
     return (
         <Pressable 
@@ -109,17 +106,16 @@ if (avatarOnFile) {
 
   
 export const HeaderButtons = () => {
-    console.log('HeaderButtons component is rendering on Profile Page.');
     return (
         <View style={styles.headerRightContainer}>
             <NameAbbreviation />
-                <Image
-                    source={require('../assets/shoppingbag-bw.png')}
-                    style={styles.headerButton}
-                    resizeMode="contain"
-                    accessible={true}
-                    accessibilityLabel={'Shopping Bag'}
-                />
+            <Image
+                source={require('../assets/shoppingbag-bw.png')}
+                style={styles.headerButton}
+                resizeMode="contain"
+                accessible={true}
+                accessibilityLabel={'Shopping Bag'}
+            />
         </View>
     );
   };

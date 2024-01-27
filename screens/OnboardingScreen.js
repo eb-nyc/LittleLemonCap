@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, SafeAreaView, ScrollView} from 'react-native';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import AuthContext from '../AuthContext';
+import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, ScrollView, Keyboard} from 'react-native';
 import { validateEmail, validateName } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
@@ -10,10 +11,9 @@ export default function OnboardingScreen({navigation}) {
 // GENERAL SCREEN VARIABLES
   const pressableInputRef = useRef(); //Ref to store reference to current Pressable
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [onboardedStatus, setOnboardedStatus] = useState(false);
+  const { signIn } = useContext(AuthContext);
 // ALL VARIABLES RELATED TO THE EMAIL ADDRESS
   const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
-  const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
   const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
   const emailInputRef = useRef();   //Ref to store reference to TextInput component
   const [displayEmail, setDisplayEmail] = useState('');
@@ -38,6 +38,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeFirstName(userFirstNameString);
         setDisplayFirstName(userFirstNameString);
         setValidFirstName(true);
+      } else {
+        onChangeFirstName('');
+        setDisplayFirstName('');
+        setValidFirstName(false);
       }
     } catch (e) {
       console.error(`Error loading first name from AsyncStorage: `, e);
@@ -50,7 +54,8 @@ export default function OnboardingScreen({navigation}) {
   // Function to save new user-provided first name to AsyncStorage as {userFirstName}
   const saveFirstName = async () => {
     try {
-    await AsyncStorage.setItem('userFirstName', firstName);
+    await AsyncStorage.setItem('userFirstName', firstName.toString());
+    console.log(`AsyncStorage record for {userFirstName} updated to`,firstName.toString());
     } catch (e) {
     console.error(`Error saving first name to AsyncStorage: `,e);
     }
@@ -66,6 +71,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeLastName(userLastNameString);
         setDisplayLastName(userLastNameString);
         setValidLastName(true);
+      } else {
+        onChangeLastName('');
+        setDisplayLastName('');
+        setValidLastName(false);
       }
     } catch (e) {
       console.error(`Error loading last name from AsyncStorage: `, e);
@@ -78,7 +87,8 @@ export default function OnboardingScreen({navigation}) {
   // Function to save new user-provided last name to AsyncStorage as {userLastName}
   const saveLastName = async () => {
     try {
-    await AsyncStorage.setItem('userLastName', lastName);
+    await AsyncStorage.setItem('userLastName', lastName.toString());
+    console.log(`AsyncStorage record for {userLastName} updated to`,lastName.toString());
     } catch (e) {
     console.error(`Error saving last name to AsyncStorage: `,e);
     }
@@ -93,6 +103,10 @@ export default function OnboardingScreen({navigation}) {
         onChangeEmail(userEmailString);
         setDisplayEmail(userEmailString);
         setValidEmail(true);
+      } else {
+        onChangeEmail('');
+        setDisplayEmail('');
+        setValidEmail(false);
       }
     } catch (e) {
       console.error(`Error loading user profile: `, e);
@@ -105,18 +119,10 @@ export default function OnboardingScreen({navigation}) {
   // Function to save new user-provided email to AsyncStorage as {userEmail}
 const saveUserEmail = async () => {
     try {
-    await AsyncStorage.setItem('userEmail', email);
+    await AsyncStorage.setItem('userEmail', email.toString());
+    console.log(`AsyncStorage record for {userEmail} updated to`,email);
     } catch (e) {
     console.error(`Error saving user profile: `,e);
-    }
-};
-
-  // Function to save onboarding status to AsyncStorage as {userOnboarded}
-  const saveOnboardedStatus = async () => {
-    try {
-    await AsyncStorage.setItem('userOnboarded', onboardedStatus.toString());
-    } catch (e) {
-    console.error(`Error saving user's onboarding status: `,e);
     }
 };
 
@@ -125,8 +131,8 @@ const saveUserEmail = async () => {
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
-        'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
-        'Karla': require('../assets/fonts/Karla.ttf'),
+        'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+        'Karla': require('../assets/fonts/Karla-var.ttf'),
       });
       setFontLoaded(true);
     }
@@ -138,13 +144,13 @@ const saveUserEmail = async () => {
 
   // function to remove the keyboard - used when valid email address is submitted
   const dismissKeyboard = () => {
-    emailInputRef.current.blur(); 
+    Keyboard.dismiss(); 
   };
 
 
   // function to handle "return" key press on the first name TextInput
   const handleFirstNameReturn = () => {
-    reviewFirstNameEntry(firstName); // Validate the current first name content
+    //reviewFirstNameEntry(firstName); // Validate the current first name content
     processFirstNameSubmission(); // Process the submission based on validation
   };
 
@@ -223,14 +229,11 @@ const saveUserEmail = async () => {
   };
     
   // function to determine which prompt should be presented to user depending if text in the input area  
-  // is a valid email (validEmail) and if an email was already provided (subscribed).
-// Old code for reference:     {(validEmail && !(email == '' || email == null) && subscribed) && ( 
+  // is a valid email (validEmail).
   const processEmailSubmission = () => {
     {!validEmail && (
       handleInvalidEmail() )}
-    {(validEmail && !subscribed) && ( 
-      handleNewSubscription() )}
-    {(validEmail && subscribed) && ( 
+    {validEmail && ( 
       handleEmailUpdate() )}
   };
 
@@ -239,27 +242,20 @@ const saveUserEmail = async () => {
     Alert.alert('Please provide a valid email address'); 
   };
 
-  // function to alert user that the submitted information has been accepted
-  const handleNewSubscription = () => {
-  // Alert.alert(`Welcome to the Club!`); 
-    setSubscribed(true);
-    dismissKeyboard(); 
-    saveUserEmail();
-  };
-
   // function to alert user that their email address as been updated with the submitted email
   const handleEmailUpdate = () => {
   //  Alert.alert(`Thank you\nYour info has been updated.`); 
-      setSubscribed(true);
       dismissKeyboard(); 
       saveUserEmail();
   }
     
   // function to execute steps when the "Next" button is used successfully
-  const handleNextButton = () => {
-      setOnboardedStatus(true); 
+  const handleNextButton = async () => {
       dismissKeyboard(); 
-      saveOnboardedStatus();
+      saveFirstName();
+      saveLastName();
+      saveUserEmail();
+      await signIn();
   }
       
   
@@ -339,30 +335,10 @@ const saveUserEmail = async () => {
       </View>
 
       <View style={styles.formButtonContainer}>
-        {!validFirstName && ( 
+        {(!validFirstName || !validLastName || !validEmail || email == '' || email == null) && ( 
           <Pressable
           style={styles.invalidButton}
-          onPress={handleInvalidFirstName}
-          hitSlop={{top: 20, bottom: 20}}
-          >
-            <Text style={styles.navigationButtonText}>Next</Text>
-          </Pressable>
-        )}
-
-        {!validLastName && ( 
-          <Pressable
-          style={styles.invalidButton}
-          onPress={handleInvalidLastName}
-          hitSlop={{top: 20, bottom: 20}}
-          >
-            <Text style={styles.navigationButtonText}>Next</Text>
-          </Pressable>
-        )}
-
-        {((!validEmail || email == '' || email == null)) && ( 
-          <Pressable
-          style={styles.invalidButton}
-          onPress={handleInvalidEmail}
+          onPress={null}
           hitSlop={{top: 20, bottom: 20}}
           >
             <Text style={styles.navigationButtonText}>Next</Text>
