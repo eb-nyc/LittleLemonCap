@@ -30,8 +30,8 @@ export const NameAbbreviation = () => {
     useEffect(() => {
         async function loadFont() {
             await Font.loadAsync({
-            'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
-            'Karla': require('../assets/fonts/Karla.ttf'),
+            'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+            'Karla': require('../assets/fonts/Karla-var.ttf'),
             });
             setFontLoaded(true);
         };

@@ -127,30 +127,6 @@ export default function ProfileScreen({navigation}) {
   }, [userAvatar]);
 
 
-  // const saveDefaultAvatar = () => {
-  //   setUserAvatar('../assets/profile-image.png');
-  //   console.log('Message to confirm the saveDefaultAvatar function is running.');
-  //   console.log(userAvatar); // Log the value immediately after setting it
-  // };
-
-  // FORMER CODE
-  // const saveDefaultAvatar = async () => {
-  //     try {
-  //       setUserAvatar('../assets/profile-image.png');
-  //       console.log ('Message to confirm the saveDefaultAvatar function is running.');
-  //     } catch (e) {
-  //       console.error(`setUserAvatar Error. userAvatar not set because:`, e);
-  //     } finally {
-  //       setTimeout(() => {
-  //         console.log (userAvatar);
-  //     }, 1000);
-  //     }
-  // };
-      //console.log ('Message to confirm the saveDefaultAvatar function is running.')
-      // setUserAvatar('../assets/profile-image.png');
-      // console.log (userAvatar);
-
-
   const loadDefaultAvatar = () => {
     // Load the default avatar image
     console.log ('Message to confirm the loadDefaultAvatar function is running.');
@@ -381,8 +357,8 @@ const saveUserEmail = async () => {
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
-        'MarkaziText': require ('../assets/fonts/MarkaziText.ttf'),
-        'Karla': require('../assets/fonts/Karla.ttf'),
+        'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+        'Karla': require('../assets/fonts/Karla-var.ttf'),
       });
       setFontLoaded(true);
     }
@@ -585,7 +561,7 @@ const saveUserEmail = async () => {
       <View style={styles.avatarEditContainer}>
         <View style={styles.avatarButtonContainer}>
               <Image
-                style={styles.transparentAvatarContainer}
+                style={styles.blankAvatarContainer}
                 source={userAvatar}
                 resizeMode="contain"
                 accessible={true}
