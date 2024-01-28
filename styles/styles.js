@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     headerRightContainer: {
         flexDirection: 'row',
         marginBottom: 11,
-        width: 86,
+        width: 120,
         height: 40,
     },
     abbreviationContainer: {
@@ -262,6 +262,18 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         color: 'black',
         textAlign: 'center',
+    },
+    editProfileKarla: {
+        fontSize: 12,
+        fontFamily: "Karla",
+        paddingTop: 0,
+        paddingBottom: 0,
+        paddingRight: 2,
+        marginVertical: 0,
+        alignSelf: 'center',
+        fontWeight: 'normal',
+        color: 'black',
+        textAlign: 'right',
     },
     notificationsKarla: {
         fontSize: 16,
