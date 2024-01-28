@@ -5,6 +5,12 @@ import styles from '../styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import {loadUserAvatar} from '../screens/ProfileScreen';
+import AuthContext from '../AuthContext';
+
+/*
+import AuthContext from '../AuthContext';
+const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
+*/
 
 export const HeaderLogo = () => {
   return (
@@ -25,6 +31,8 @@ export const NameAbbreviation = () => {
     const [userAvatar, setUserAvatar] = useState(null);
     const navigation = useNavigation();
     const pressableProfileRef = useRef(); //Ref to store reference to current Pressable
+    const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
+
 
     // Function to load up the necessary fonts
     useEffect(() => {
@@ -39,6 +47,20 @@ export const NameAbbreviation = () => {
     }, []);
 
     // function to load abbreviations from Async userFirstName and userLastName
+    const fetchNames = () => {
+        let userFirstName = contextFirstName;
+        let userLastName = contextLastName;
+        const firstLetter = userFirstName ? userFirstName.charAt(0) : null;
+        const secondLetter = userLastName ? userLastName.charAt(0) : null;
+
+        // Combine the letters to form the two-letter abbreviation
+        const abbreviationResult = firstLetter + secondLetter;
+
+        // Update the state with the abbreviation
+        setAbbreviation(abbreviationResult);
+    };
+
+/*
     const fetchNames = async () => {
         let userFirstName;
         let userLastName;
@@ -60,13 +82,15 @@ export const NameAbbreviation = () => {
             setAbbreviation(abbreviationResult);
         };
     };
+*/
+
 
     // Use the useEffect hook to fetch abbreviations when the component mounts or when the fonts are loaded
     useEffect(() => {
         if (fontLoaded) {
             fetchNames();
         }
-    }, [fontLoaded]);
+    }, [fontLoaded, contextFirstName, contextLastName]);
 
   // Function to transfer device's user image from AsyncStorage to a variable.
   // This is only done once when this component initially renders.
@@ -106,8 +130,14 @@ if (userAvatar) {
 
   
 export const HeaderButtons = () => {
+    const navigation = useNavigation();
     return (
         <View style={styles.headerRightContainer}>
+            <Pressable style ={styles.editProfileKarla} onPress={() => navigation.navigate('Profile')}>
+                <Text style ={styles.editProfileKarla}>
+                    Edit{'\n'}Profile
+                </Text>
+            </Pressable>
             <NameAbbreviation />
             <Image
                 source={require('../assets/shoppingbag-bw.png')}

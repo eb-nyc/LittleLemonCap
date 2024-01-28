@@ -6,10 +6,13 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { HeaderLogo, HeaderButtons, LogoBackButton } from '../components/Graphics';
-import { loadOnboardingCompleted } from '../utils';
 import * as Font from 'expo-font';
 import AuthContext from '../AuthContext';
 
+/*
+import AuthContext from '../AuthContext';
+const { isOnboardingCompleted } = React.useContext(AuthContext); //Context hook variable for routing
+*/
 
 const Stack = createNativeStackNavigator();
 
@@ -34,19 +37,9 @@ const [fontLoaded, setFontLoaded] = useState(false);
   // Function to transfer device's user onboading completion status from AsyncStorage to a variable.
   // This is only done once when this component initially renders.
   useEffect(() => {
-    const loadOnboarding = async () => {
-      try {
-        const userOnboardingCompleted = await loadOnboardingCompleted();
-        console.log(`loadingOnboarding: isOnboardingCompleted set to`, isOnboardingCompleted,`based on AsyncStorage.`);
-      } catch (e) {
-        console.error("Error loading onboarding status:", e);
-      } finally {
         setTimeout(() => {
           setIsLoading(false);
         }, 1000);
-      }
-    };
-    loadOnboarding();
   }, []);
 
 

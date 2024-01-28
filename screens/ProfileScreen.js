@@ -15,10 +15,12 @@ export default function ProfileScreen({navigation}) {
   // GENERAL SCREEN VARIABLES
     const pressableInputRef = useRef(); //Ref to store reference to current Pressable
     const [fontLoaded, setFontLoaded] = useState(false);
-    const { signOut } = useContext(AuthContext);
+    const { signOut, updateFirstName, updateLastName } = useContext(AuthContext);
+    const [contextFirstName, setContextFirstName] = React.useState(''); //React Context variable to hold first name
+    const [contextLastName, setContextLastName] = React.useState(''); //React Context variable to hold last name
   // ALL VARIABLES RELATED TO THE AVATAR IMAGE MANAGMENT
     const [avatarOnFile, setAvatarOnFile] = useState(false);
-    const [userAvatar, setUserAvatar] = useState(null);
+    const [userAvatar, setUserAvatar] = useState(require('../assets/profile-ph.png'));
   // ALL VARIABLES RELATED TO THE EMAIL ADDRESS
     const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
     const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
@@ -72,7 +74,7 @@ export default function ProfileScreen({navigation}) {
 
   useEffect(() => {
     loadUserAvatar();
-    console.log(`-- useEffect (loadUserAvatar) --`);
+    console.log(`-- useEffect (ProfileScreen.js - loadUserAvatar) --`);
   }, []);
 
 
@@ -262,6 +264,7 @@ const saveUserEmail = async () => {
       console.log('User first name removed from AsyncStorage.');
       setValidFirstName(false);
       onChangeFirstName('');
+      await setContextFirstName('');
     } catch (e) {
       console.error('Error removing user first name from AsyncStorage: ', e);
     }
@@ -285,6 +288,7 @@ const saveUserEmail = async () => {
       console.log('User last name removed from AsyncStorage.');
       setValidLastName(false);
       onChangeLastName('');
+      await setContextLastName('');
     } catch (e) {
       console.error('Error removing user last name from AsyncStorage: ', e);
     }
@@ -431,6 +435,7 @@ const saveUserEmail = async () => {
       const firstNameIsValid = validateName(enteredFirstName);
       setValidFirstName(firstNameIsValid);
       onChangeFirstName(enteredFirstName);
+      setContextFirstName(enteredFirstName);
     // }
   };
 
@@ -440,6 +445,7 @@ const saveUserEmail = async () => {
     const lastNameIsValid = validateName(enteredLastName);
     setValidLastName(lastNameIsValid);
     onChangeLastName(enteredLastName);
+    setContextLastName(enteredLastName);
   };
 
   // function to determine which prompt should be presented to user depending if text in the input area  
@@ -526,11 +532,13 @@ const saveUserEmail = async () => {
 
     // ****  SAVE AND EXIT FUNCTION MANAGEMENT FUNCTION ****
     // function to manage all updates when Save & Exit button is pressed
-    const saveAndExit = () => {
-        Keyboard.dismiss();;
+    const saveAndExit = async () => {
+        Keyboard.dismiss();
         //saveAvatarImage(userAvatar);
-        saveFirstName();
-        saveLastName(); 
+        //saveFirstName();
+        //saveLastName(); 
+        await updateFirstName(firstName);
+        await updateLastName(lastName);
         saveUserEmail();
         savePhone();
         navigation.navigate('Home');
