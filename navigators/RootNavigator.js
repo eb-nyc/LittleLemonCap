@@ -63,7 +63,6 @@ if (isLoading) {
       headerLeft: () => <HeaderBackButton 
         labelVisible={false} 
         backImage={() => <LogoBackButton />} />,
-      // headerRight: () => <HeaderButtons />,
     }}>
       {isOnboardingCompleted ? (
         // Onboarding completed, user is signed in
@@ -74,13 +73,15 @@ if (isLoading) {
           options={{
             headerLeft: () => <HeaderLogo />,
             headerRight: () => <HeaderButtons />,
+            headerShadowVisible: false,
           }}
         />
         <Stack.Screen 
           name="Profile" 
           component={ProfileScreen}
           options={{
-            headerRight: () => <HeaderButtons />, 
+            headerRight: () => <HeaderButtons />,
+            headerShadowVisible: false, 
           }}       
         />
         </>
@@ -91,6 +92,7 @@ if (isLoading) {
         component={OnboardingScreen} 
         options={{
           headerLeft: () => <HeaderLogo />,
+          headerShadowVisible: false,
         }}
       />
     )}

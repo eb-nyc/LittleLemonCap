@@ -4,13 +4,13 @@ import { SECTION_LIST_MOCK_DATA } from './utils';
 const db = SQLite.openDatabase('little_lemon');
 
 // *createTable* creates a new table in the 'little lemon' database called 'menuitems' with a primary key and...
-// the following fields: uuid, title, price, category
+// the following fields: uuid, title, description, price, photo, category
 export async function createTable() {
   return new Promise((resolve, reject) => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          'create table if not exists menuitems (id integer primary key not null, uuid text, title text, price text, category text);'
+          'create table if not exists menuitems (id integer primary key not null, uuid text, title text, description text, price text, photo text, category text);'
         );
       },
       reject,
@@ -32,18 +32,28 @@ export async function getMenuItems() {
 
 // *saveMenuItems* populates the SQLite table 'menuitems' with data from the JSON via fetchData > getMenuItems > menuItems 
 // Ref: Coursera Note - 2. Implement a single SQL statement to save all menu data in a table called menuitems.
-// Note that Coursera suggested the following code:
-// insert into menuitems (uuid, title, price, category) values ${menuItems
-//  .map((item) =>
-//    `('${item.id}', '${item.title}', '${item.price}', '${item.category}')`)
-//     	.join(', ')}
+
+// export function saveMenuItems(menuItems) {
+//   db.transaction((tx) => {
+//     menuItems.forEach((item) => {
+//       tx.executeSql (
+//         'insert into menuitems (uuid, title, price, category) values(?, ?, ?, ?)',
+//         [item.id, item.title, item.price, item.category]
+//       );
+//     });
+//   });
+// }
+
 export function saveMenuItems(menuItems) {
   db.transaction((tx) => {
-    menuItems.forEach((item) => {
-      tx.executeSql (
-        'insert into menuitems (uuid, title, price, category) values(?, ?, ?, ?)',
-        [item.id, item.title, item.price, item.category]
-      );
+    tx.executeSql('DELETE FROM menuitems', [], (_, result) => {
+      // After deleting existing data, insert new data
+      menuItems.forEach((item) => {
+        tx.executeSql (
+          'INSERT INTO menuitems (uuid, title, description, price, photo, category) VALUES (?, ?, ?, ?, ?, ?)',
+          [item.id, item.title, item.description, item.price, item.photo, item.category]
+        );
+      });
     });
   });
 }

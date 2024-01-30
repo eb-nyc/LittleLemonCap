@@ -9,6 +9,7 @@ import {
   Alert,
   Keyboard,
   Image,
+  Pressable,
 } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import debounce from 'lodash.debounce';
@@ -33,28 +34,13 @@ import menuData from '../assets/little-lemon-menu.json'
 const sections = ['Appetizers', 'Salads', 'Entrees'];
 
 // This creates the layout for how each line of the menu will be displayed.
-const Item = ({ title, description, price, photo }) => (
+const Item = ({ title, price }) => (
   <View style={styles.item}>
-    <View style={styles.itemText}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.itemDescription}>
-        <Text style={styles.foodDescription}>{description}</Text>
-      </View>
-      <Text style={styles.title}>${price}</Text>
-    </View>
-    <View style={styles.itemPhoto}>
-      <Image
-          source={{ photo }}
-        />
-    </View>
+    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.title}>${price}</Text>
   </View>
 );
 
-    {/* <View style={styles.itemPhoto}> */}
-          //style={styles.foodImage}
-// source={require('../assets/photo-hero-LL-sm.jpg')}
-// source={require('../assets/food-hummus-sm.jpg')}
-// source={{ uri: '../assets/food-hummus-sm.jpg' }}
   
 // MAIN COMPONENT DECLARATION & EXPORT STATEMENT
 export default function App() {
@@ -81,9 +67,7 @@ export default function App() {
       const convertedMenu = json.menu.map(item => ({
         id: item.id,
         title: item.title,
-        description: item.description,
         price: item.price,
-        photo: item.photo,
         category: item.category.title,
       }));
       return convertedMenu;
@@ -250,9 +234,7 @@ useUpdateEffect(() => {
         sections={filteredData}
         keyExtractor={(item, index) => item.id || index.toString()}
         renderItem={({ item }) => (
-          <Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
-          //<Item title={item.title} price={item.price} />
-          //<Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
+          <Item title={item.title} price={item.price} />
         )}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.header}>{title}</Text>
@@ -293,34 +275,9 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingVertical: 6,
-    borderColor: '#D9D9D9',
-    borderBottomWidth: 1,
+    alignItems: 'center',
+    padding: 16,
   },
-  itemText: {
-    flex: 1,
-    flexDirection: 'column',
-    paddingRight: 6,
-    backgroundColor: 'orange'
-    //alignItems: 'flex-start',
-    //justifyContent: 'center',
-  },
-  itemDescription: {
-    height: 80,
-    width: '100%',
-    //alignItems: 'flex-start',
-    //justifyContent: 'center',
-  },
-  itemPhoto: {
-    //flex: 0.35,
-    width: 133,
-    height: 100,
-    borderRadius: 16,
-    backgroundColor: 'yellow',
-    overflow: 'hidden',
-  },
-
   header: {
     fontSize: 16,
     paddingVertical: 0,
@@ -328,6 +285,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: '#435F57',
     backgroundColor: '#FFF',
+  },
+  title: {
+    fontSize: 20,
+    color: 'black',
+    //textAlign: 'center',
   },
 
 // CONTAINERS - For leading content
@@ -371,15 +333,6 @@ const styles = StyleSheet.create({
   },
 
 // FONTS
-  title: {
-    fontSize: 18,
-    color: 'black',
-    //textAlign: 'center',
-  },
-  foodDescription: {
-    fontSize: 14,
-    color: 'black',
-  },
   displayTitleMarkazi: {
     fontSize: 64,
     fontFamily: "MarkaziText",
@@ -421,13 +374,6 @@ const styles = StyleSheet.create({
 
 // ELEMENTS
   descImage: {
-    width: '100%',
-    flex: 1,
-    alignSelf: 'center',
-    //borderRadius: 16,
-    resizeMode: 'cover',
-  },
-  foodImage: {
     width: '100%',
     flex: 1,
     alignSelf: 'center',

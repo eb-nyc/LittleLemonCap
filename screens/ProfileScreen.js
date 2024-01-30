@@ -559,9 +559,9 @@ const saveUserEmail = async () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={90} // Add pixels of space between keyboard and content
     >
+    <View style={styles.topCurveContainer}/>
     <ScrollView style={styles.profileInputContainer}>
       <Text style={styles.sectionTitleKarla}>PROFILE INFORMATION</Text>
-
       <View style={styles.cardTitleContainer}>
         <Text style={styles.cardtitleKarla}>Avatar:</Text> 
         <Text style={styles.cardcaptionKarla}> (optional)</Text>

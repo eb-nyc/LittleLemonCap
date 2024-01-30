@@ -107,6 +107,53 @@ const styles = StyleSheet.create({
         width: '100%',
       },  
 
+
+// CONTAINERS - For leading content
+    leadContentContainer: {
+        width: '100%',
+        height: 340,
+        //alignItems: 'center',
+        //justifyContent: 'center',
+        backgroundColor: '#435F57',
+        borderTopRightRadius: 16,
+        borderTopLeftRadius: 16,
+        paddingHorizontal: 25,
+        paddingVertical: 25,
+        marginBottom: 15,
+    },
+    leadDescriptionContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginVertical: 8,
+    },
+    descTextContainer: {
+        flex: 1,
+        paddingRight: 12,
+        //alignItems: 'flex-start',
+        //justifyContent: 'center',
+    },
+    descImageContainer: {
+        flex: 1,
+        //alignItems: 'flex-start',
+        //justifyContent: 'center',
+        borderRadius: 16,
+    },
+    topCurveContainer: {
+        width: '100%',
+        height: 16,
+        backgroundColor: 'transparent',
+        borderTopRightRadius: 16,
+        borderTopLeftRadius: 16,
+        borderTopColor: '#EDEFEE',
+        borderRightColor: '#EDEFEE',
+        borderLeftColor: '#EDEFEE',
+        borderBottomColor: 'transparent',
+        borderWidth: 2,
+    },
+
+
+
 // IMAGES
     splashLogo: {
         width: 300,
@@ -146,6 +193,15 @@ const styles = StyleSheet.create({
         padding: 0,
         marginTop: 35,
         marginBottom: 5,
+        backgroundColor: '#FFF',
+    },
+    descImage: {
+        width: 166,
+        height: 122,
+        resizeMode: 'contain',
+       //alignSelf: 'center',
+        padding: 0,
+        borderRadius: 16,
     },
     blankAvatarContainer: {
         width: 80,
@@ -198,12 +254,28 @@ const styles = StyleSheet.create({
       textAlign: 'center',
     },
     subtitleMarkazi: {
-      fontSize: 40,
-      fontFamily: "MarkaziText",
-      padding: 10,
-      marginVertical: 8,
-      color: '#48742C',
-      textAlign: 'center',
+        fontSize: 40,
+        fontFamily: "MarkaziText",
+        padding: 4,
+        marginVertical: 0,
+        color: '#48742C',
+        textAlign: 'center',
+    },
+    displayTitleMarkazi: {
+        fontSize: 64,
+        fontFamily: "MarkaziText",
+        padding: 0,
+        marginBottom: -18,
+        color: '#F4CE14',
+        textAlign: 'left',
+    },
+    headTitleMarkazi: {
+        fontSize: 40,
+        fontFamily: "MarkaziText",
+        padding: 0,
+        marginVertical: 0,
+        color: 'white',
+        textAlign: 'left',
     },
     cardtitleKarla: {
         fontSize: 18,
@@ -213,6 +285,16 @@ const styles = StyleSheet.create({
         marginVertical: 0,
         fontWeight: 'bold',
         color: 'black',
+        textAlign: 'left',
+    },
+    descTextKarla: {
+        fontSize: 16,
+        fontFamily: "Karla",
+        paddingTop: 0,
+        paddingBottom: 0,
+        marginVertical: 0,
+        fontWeight: 'normal',
+        color: 'white',
         textAlign: 'left',
     },
     cardcaptionKarla: {
@@ -228,9 +310,8 @@ const styles = StyleSheet.create({
     sectionTitleKarla: {
         fontSize: 20,
         fontFamily: "Karla",
-        paddingTop: 4,
-        paddingBottom: 4,
-        marginVertical: 10,
+        paddingTop: 0,
+        paddingBottom: 14,
         fontWeight: '900',
         color: 'black',
         textAlign: 'center',

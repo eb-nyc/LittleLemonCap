@@ -63,7 +63,9 @@ export function useUpdateEffect(effect, dependencies = []) {
         data: filteredItems.map((item) => ({
           id: item.id,
           title: item.title,
+          description: item.description,
           price: item.price,
+          photo: item.photo,
         })),
       };
     });

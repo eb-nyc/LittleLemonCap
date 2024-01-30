@@ -270,18 +270,36 @@ const saveUserEmail = async () => {
     <ScrollView
       style={styles.pageContainer}
     >
-      <Image
-        style={styles.image}
-        source={require('../assets/little-lemon-logo-grey.png')}
-        resizeMode="contain"
-        accessible={true}
-        accessibilityLabel={'Little Lemon alternate grey logo'}
-      />
-      <Text style={styles.regularText}>
-        {displayFirstName} {displayLastName} {'\n'}
-        {displayEmail}
-      </Text>
+      <View style={styles.leadContentContainer}>
+        <Text style={styles.displayTitleMarkazi}>
+          Little Lemon
+        </Text>
+        <Text style={styles.headTitleMarkazi}>
+          Welcome To Our Family!
+        </Text>
 
+        <View style={styles.leadDescriptionContainer}>
+          <View style={styles.descTextContainer}>
+            <Text style={styles.descTextKarla}>
+            Sign up for exclusive rewards and tasty perks. 
+            Elevate your dining experience with our Little Lemon loyalty program.
+            {'\n\n'}
+            Join today!
+            </Text>
+          </View>
+          <View style={styles.descImageContainer}>
+            <Image
+              style={styles.descImage}
+              source={require('../assets/photo-eating-out-sm.jpg')}
+              resizeMode="contain"
+              accessible={true}
+              accessibilityLabel={'Happy group of friends dining at Little Lemon'}
+            />
+          </View>
+        </View>
+
+      </View>
+      
       <View style={styles.formContainer}>
         <View style={styles.formHeadContainer}> 
           <Text style={styles.subtitleMarkazi}>
