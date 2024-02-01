@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { SECTION_LIST_MOCK_DATA } from './utils';
 
 const db = SQLite.openDatabase('little_lemon');
 
@@ -33,6 +34,20 @@ export async function getMenuItems() {
 }
 
 
+// *saveMenuItems* populates the SQLite table 'menuitems' with data from the JSON via fetchData > getMenuItems > menuItems 
+// Ref: Coursera Note - 2. Implement a single SQL statement to save all menu data in a table called menuitems.
+
+// export function saveMenuItems(menuItems) {
+//   db.transaction((tx) => {
+//     menuItems.forEach((item) => {
+//       tx.executeSql (
+//         'insert into menuitems (uuid, title, price, category) values(?, ?, ?, ?)',
+//         [item.id, item.title, item.price, item.category]
+//       );
+//     });
+//   });
+// }
+
 export function clearSQL() {
   db.transaction((tx) => {
     tx.executeSql('DELETE FROM menuitems', [], (_, deleteResult) => {
@@ -54,10 +69,90 @@ export function saveMenuItems(menuItems) {
     });
   });
 }
-/*
 
 
-*/
+// export function saveMenuItems(menuItems) {
+//   db.transaction((tx) => {
+//     menuItems.forEach((item) => {
+//       tx.executeSql (
+//         'insert into menuitems (uuid, title, price, category) values(?, ?, ?, ?)',
+//         [item.id, item.title, item.price, item.category]
+//       );
+//     });
+//   });
+// }
+
+
+
+
+// Below is the most recent function from 01.31 morning. Trying to break it up to test. See code above.
+// export function saveMenuItems(menuItems) {
+//   console.log('database.js > saveMenuItems > menuItems before save to SQL Lite:', menuItems);
+//   db.transaction((tx) => {
+//     tx.executeSql('BEGIN TRANSACTION');
+//       try {
+//         menuItems.forEach((item) => {
+//           tx.executeSql ('INSERT OR REPLACE INTO menuitems (uuid, title, description, price, photo, category) VALUES (?, ?, ?, ?, ?, ?)',
+//             [item.id, item.title, item.description, item.price, item.photo, item.category],
+//             (_, insertResult) => {
+//               console.log('saveMenuItems Insertion Result:', insertResult);
+//             }
+//           );
+//         });
+//         tx.executeSql('COMMIT');
+//       } catch (e) {
+//         console.error(`Error in saveMenuItems:`,e);
+//       }
+//   });
+// }
+
+// export function saveMenuItems(menuItems) {
+//   return new Promise((resolve, reject) => {    //NEW LINE: Maybe why menu didn't display
+//     console.log('JSON Menu Items Before:', menuItems);
+//     db.transaction((tx) => {
+//       tx.executeSql('DELETE FROM menuitems', [], (_, deleteResult) => {
+//         console.log('saveMenuItems Deletion Result:', deleteResult);
+//         menuItems.forEach((item, index, array) => {
+//           tx.executeSql (
+//             'INSERT INTO menuitems (uuid, title, description, price, photo, category) VALUES (?, ?, ?, ?, ?, ?)',
+//             [item.id, item.title, item.description, item.price, item.photo, item.category],
+//             (_, insertResult) => {
+//               console.log('saveMenuItems Insertion Result:', insertResult);
+//               if (index === array.length - 1) {   //NEW LINE: Maybe why menu didn't display
+//                 resolve();  // Resolve the promise after the last insertion   //NEW LINE: Maybe why menu didn't display
+//               }
+//             }
+//           );
+//         });
+//       });
+//     });
+//   });
+// }
+
+// export function saveMenuItems(menuItems) {
+//   return new Promise((resolve, reject) => {
+//     console.log('JSON Menu Items Before:', menuItems);
+//     db.transaction((tx) => {
+//       tx.executeSql('DELETE FROM menuitems', [], (_, deleteResult) => {
+//         console.log('saveMenuItems Deletion Result:', deleteResult);
+//         menuItems.forEach((item, index, array) => {
+//           tx.executeSql (
+//             'INSERT INTO menuitems (uuid, title, description, price, photo, category) VALUES (?, ?, ?, ?, ?, ?)',
+//             [item.id, item.title, item.description, item.price, item.photo, item.category],
+//             (_, insertResult) => {
+//               console.log('saveMenuItems Insertion Result:', insertResult);
+//               if (index === array.length - 1) {
+//                 resolve();  // Resolve the promise after the last insertion
+//               }
+//             }
+//           );
+//         });
+//       });
+//     });
+//   });
+// }
+
+
 
 /**
 Component that executes a SQL statement to filter the menu by 2 criteria: a query string and a list of categories.

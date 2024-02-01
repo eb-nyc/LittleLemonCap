@@ -1,0 +1,101 @@
+{
+    "menu": [
+      {
+        "id": 1,
+        "title": "Hummus with Pita Bread",
+        "description": "Crafted from chickpeas, tahini, and a blend of spices, served with lightly toasted pita bread slices.",
+        "price": "10.99",
+        "photo": "../assets/food-hummus-sm.jpg",
+        "category": "Appetizers"
+      },
+      {
+        "id": 2,
+        "title": "Falafel",
+        "description": "Deep-fried chickpea or fava bean patties, often served with tahini sauce or in pita bread.",
+        "price": "12.99",
+        "photo": "../assets/food-falafel-sm.jpg",
+        "category": "Appetizers"
+      },
+/*      {
+        "id": 3,
+        "title": "Dolma",
+        "description": "Grape leaves stuffed with a mixture of rice, pine nuts, and herbs.",
+        "price": "14.99",
+        "photo": require('../assets/food-stuffedgrapeleaves-sm.jpg'),
+        "category": "Appetizers"
+      },
+      {
+        "id": 4,
+        "title": "Brushetta",
+        "description": "Grilled bread rubbed with garlic and topped with diced tomatoes, basil, and olive oil.",
+        "price": "10.99",
+        "photo": require('../assets/food-bruschetta-sm.jpg'),
+        "category": "Appetizers"
+      },
+      {
+        "id": 5,
+        "title": "Caprese Salad",
+        "description": "Sliced tomatoes, fresh mozzarella, and basil, drizzled with olive oil and balsamic glaze.",
+        "price": "12.99",
+        "photo": require('../assets/food-caprese-sm.jpg'),
+        "category": "Salads"
+      },
+      {
+        "id": 6,
+        "title": "Greek Salad",
+        "description": "Classic salad with tomatoes, cucumbers, olives, red onions, and feta cheese, drizzled with olive oil and sprinkled with oregano.",
+        "price": "13.99",
+        "photo": require('../assets/profile-image.png'),
+        "category": "Salads"
+      },
+      {
+        "id": 7,
+        "title": "Tabbouleh",
+        "description": "A refreshing salad made with finely chopped parsley, tomatoes, mint, onion, and soaked bulgur, dressed with olive oil and lemon juice.",
+        "price": "11.99",
+        "photo": require('../assets/food-tabbouleh-sm.jpg'),
+        "category": "Salads"
+      },
+      {
+        "id": 8,
+        "title": "Chickpea Salad",
+        "description": "A hearty salad with chickpeas, cherry tomatoes, cucumbers, red onions, and feta cheese, tossed in olive oil and lemon dressing.",
+        "price": "11.99",
+        "photo": require('../assets/food-chickpea-salad-sm.jpg'),
+        "category": "Salads"
+      },
+      {
+        "id": 9,
+        "title": "Grilled Souvlaki",
+        "description": "Skewers of marinated and grilled lamb or chicken, served with pita bread and tzatziki.",
+        "price": "18.99",
+        "photo": require('../assets/food-souvlaki-sm.jpg'),
+        "category": "Entrees"
+      },
+      {
+        "id": 10,
+        "title": "Ratatouille",
+        "description": "French Provençal vegetable stew made with ingredients like eggplant, zucchini, bell peppers, tomatoes, and flavored with herbs.",
+        "price": "16.99",
+        "photo": require('../assets/food-ratatouille-sm.jpg'),
+        "category": "Entrees"
+      },
+      {
+        "id": 11,
+        "title": "Seafood Risotto",
+        "description": "Creamy Italian rice dish cooked with a variety of fresh seafood, herbs, and saffron.",
+        "price": "21.99",
+        "photo": require('../assets/food-risotto-sm.jpg'),
+        "category": "Entrees"
+      },
+*/
+      {
+        "id": 12,
+        "title": "Grilled Swordfish",
+        "description": "Freshly grilled swordfish seasoned with olive oil, lemon, and herbs. Served with potatoes.",
+        "price": "25.99",
+        "photo": "../assets/food-grilledswordfish-sm.jpg",
+        "category": "Entrees"
+      }
+    ]
+  }

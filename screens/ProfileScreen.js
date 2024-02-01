@@ -6,7 +6,7 @@ import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AvatarPicker from '../utils/AvatarPicker';
-import HomeScreen from '../screens/HomeScreen';
+import HomeScreen from './HomeScreen';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -559,9 +559,9 @@ const saveUserEmail = async () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={90} // Add pixels of space between keyboard and content
     >
+    <View style={styles.topCurveContainer}/>
     <ScrollView style={styles.profileInputContainer}>
       <Text style={styles.sectionTitleKarla}>PROFILE INFORMATION</Text>
-
       <View style={styles.cardTitleContainer}>
         <Text style={styles.cardtitleKarla}>Avatar:</Text> 
         <Text style={styles.cardcaptionKarla}> (optional)</Text>

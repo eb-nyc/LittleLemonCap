@@ -9,11 +9,6 @@ import { HeaderLogo, HeaderButtons, LogoBackButton } from '../components/Graphic
 import * as Font from 'expo-font';
 import AuthContext from '../AuthContext';
 
-/*
-import AuthContext from '../AuthContext';
-const { isOnboardingCompleted } = React.useContext(AuthContext); //Context hook variable for routing
-*/
-
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
@@ -21,21 +16,20 @@ const { isOnboardingCompleted } = React.useContext(AuthContext); //Context hook 
 const [isLoading, setIsLoading] = useState(true);
 const [fontLoaded, setFontLoaded] = useState(false);
 
-    // Function to load up the necessary fonts
-    useEffect(() => {
-      async function loadFont() {
-          await Font.loadAsync({
-          'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
-          'Karla': require('../assets/fonts/Karla-var.ttf'),
-          });
-          setFontLoaded(true);
-      };
-      loadFont();
+  // Function to load up the necessary fonts
+  useEffect(() => {
+    async function loadFont() {
+        await Font.loadAsync({
+        'MarkaziText': require ('../assets/fonts/MarkaziText-var.ttf'),
+        'Karla': require('../assets/fonts/Karla-var.ttf'),
+        });
+        setFontLoaded(true);
+    };
+    loadFont();
   }, []);
 
 
-  // Function to transfer device's user onboading completion status from AsyncStorage to a variable.
-  // This is only done once when this component initially renders.
+  // Function to delay/keep the splash screen by keeping {isLoading}=true for 1,000 milliseconds.
   useEffect(() => {
         setTimeout(() => {
           setIsLoading(false);
@@ -44,8 +38,7 @@ const [fontLoaded, setFontLoaded] = useState(false);
 
 
 if (isLoading) {
-  // We haven't finished reading from AsyncStorage yet
-  // return <SplashScreen />;
+  // If we haven't finished reading from AsyncStorage yet, return <SplashScreen />
   return (
     <Stack.Navigator screenOptions={{
       orientation: 'portrait_up',
@@ -63,7 +56,6 @@ if (isLoading) {
       headerLeft: () => <HeaderBackButton 
         labelVisible={false} 
         backImage={() => <LogoBackButton />} />,
-      // headerRight: () => <HeaderButtons />,
     }}>
       {isOnboardingCompleted ? (
         // Onboarding completed, user is signed in
@@ -74,13 +66,15 @@ if (isLoading) {
           options={{
             headerLeft: () => <HeaderLogo />,
             headerRight: () => <HeaderButtons />,
+            headerShadowVisible: false,
           }}
         />
         <Stack.Screen 
           name="Profile" 
           component={ProfileScreen}
           options={{
-            headerRight: () => <HeaderButtons />, 
+            headerRight: () => <HeaderButtons />,
+            headerShadowVisible: false, 
           }}       
         />
         </>
@@ -91,6 +85,7 @@ if (isLoading) {
         component={OnboardingScreen} 
         options={{
           headerLeft: () => <HeaderLogo />,
+          headerShadowVisible: false,
         }}
       />
     )}

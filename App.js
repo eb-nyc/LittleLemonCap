@@ -11,12 +11,13 @@ export default function App({ navigation }) {
   const [contextFirstName, setContextFirstName] = React.useState(''); //React Context variable to hold first name
   const [contextLastName, setContextLastName] = React.useState(''); //React Context variable to hold last name
 
+  // Checks AsyncStorage for onboarded status. If onboarded, loads first and last name into Context hook for use throughout app
   React.useEffect(() => {
     const bootstrapAsync = async () => {
       try {
         const userOnboardingCompleted = await loadOnboardingCompleted();
         setIsOnboardingCompleted(userOnboardingCompleted);
-        console.log(`bootstrapAsync: isOnboardingCompleted set to`, userOnboardingCompleted, `based on AsyncStorage.`);
+        //console.log(`bootstrapAsync: isOnboardingCompleted set to`, userOnboardingCompleted, `based on AsyncStorage.`);  //dev check
 
         if (isOnboardingCompleted) {
           try {
@@ -27,7 +28,7 @@ export default function App({ navigation }) {
                   setContextFirstName(userFirstNameString);
                 }
               } catch (e) {
-                console.error(`Error loading first name from AsyncStorage into Context: `, e);
+                console.error(`App.js > loadFirstName. Error loading first name from AsyncStorage into Context: `, e);
               }
             };
 
@@ -38,32 +39,34 @@ export default function App({ navigation }) {
                   setContextLastName(userLastNameString);
                 }
               } catch (e) {
-                console.error(`Error loading last name from AsyncStorage into Context: `, e);
+                console.error(`App.js > loadLastName. Error loading last name from AsyncStorage into Context: `, e);
               }
             };
 
             await loadFirstName();
             await loadLastName();
           } catch (error) {
-            console.error('Error loading data into context:', error);
+            console.error('(App.js > bootstrapAsync. Error loading data into context:', error);
           }
         }
       } catch (e) {
         console.error("Error while loading onboard status on App.js:", e);
-      }
+      } 
     };
 
     bootstrapAsync();
   }, [isOnboardingCompleted]);
 
-  React.useEffect(() => {
-    console.log(`Currently this is loaded into contextFirstName:`, contextFirstName);
-  }, [contextFirstName]);
 
-  React.useEffect(() => {
-    console.log(`Currently this is loaded into contextLastName:`, contextLastName);
-  }, [contextLastName]);
+  // The two useEffect hooks below are just development checks to confirm names are saved to Context. Commmenting out for now.
+  // React.useEffect(() => {
+  //   console.log(`App.js - useEffect. Currently this is loaded into contextFirstName:`, contextFirstName);
+  // }, [contextFirstName]);
 
+
+  // React.useEffect(() => {
+  //   console.log(`App.js - useEffect. Currently this is loaded into contextLastName:`, contextLastName);
+  // }, [contextLastName]);
 
 
   const authContext = React.useMemo(
@@ -104,18 +107,7 @@ export default function App({ navigation }) {
         } catch (e) {
           console.error(`Error saving first name to AsyncStorage: `,e);
         }
-      
-      /*
-        try {
-          await AsyncStorage.setItem('userOnboarded', 'false');
-          setIsOnboardingCompleted(false);
-        } catch (e) {
-          console.error(`signOut error setting userOnboarded in AsyncStorage on App.js: `, e);
-        }
-      */
       },
-
-
       updateLastName: async (newLastName) => {
         // Transfer last name data to AsyncStorage and Context
         await setContextLastName(newLastName);
@@ -125,21 +117,12 @@ export default function App({ navigation }) {
           } catch (e) {
           console.error(`Error saving first name to AsyncStorage: `,e);
           }
-        
-        /*
-        try {
-          await AsyncStorage.setItem('userOnboarded', 'false');
-          setIsOnboardingCompleted(false);
-        } catch (e) {
-          console.error(`signOut error setting userOnboarded in AsyncStorage on App.js: `, e);
-        }
-        */
       },
-
     }),
     []
   );
 
+  
   return (
     <AuthContext.Provider value={{ isOnboardingCompleted, contextFirstName, contextLastName, ...authContext }}>
       <NavigationContainer>

@@ -8,35 +8,31 @@ import {
   StatusBar,
   Alert,
   Keyboard,
-  ScrollView,
   Image,
 } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import debounce from 'lodash.debounce';
 import {
   createTable,
-  clearSQL,
   saveMenuItems,
   getMenuItems,
   filterByQueryAndCategories,
 } from '../database';
 import Filters from '../components/Filters';
 import { getSectionListData, useUpdateEffect } from '../utils';
+
 //Import menu data from a resident file
 import freshData from '../assets/little-lemon-menu.json'
 // Note: If it doesn't appear this data is being imported, we can try an alternate way to import the data using "require":
 // const freshData = require('./data.json');
 
-// *************************
-// COMMENTED OUT FOR TESTING
-// *************************
+
 
 const sections = ['Appetizers', 'Salads', 'Entrees'];
 
 // This creates the layout for how each line of the menu will be displayed.
 const Item = ({ title, description, price, photo }) => (
   <View style={styles.item}>
-    {console.log('HomeScreen > Item > Confirmation that a SectionList item is being rendered.')}
     <View style={styles.itemText}>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.itemDescription}>
@@ -56,17 +52,21 @@ const Item = ({ title, description, price, photo }) => (
             //flex: 1,
             }}
         />
-      ) : (
-        console.log('HomeScreen > Item > {photo} not found for an item.')
-      )}
+      ) : null}
     </View>
   </View>
 );
 
+    {/* <View style={styles.itemPhoto}> */}
+          //style={styles.foodImage}
+// source={require('../assets/photo-hero-LL-sm.jpg')}
+// source={require('../assets/food-hummus-sm.jpg')}
+// source={{ uri: '../assets/food-hummus-sm.jpg' }}
+  
+
 
 // MAIN COMPONENT DECLARATION & EXPORT STATEMENT
 export default function App() {
-
   const [data, setData] = useState([]);
   const [searchBarText, setSearchBarText] = useState('');
   const [query, setQuery] = useState('');
@@ -75,112 +75,198 @@ export default function App() {
   );
   const [filteredData, setFilteredData] = useState([]);
 
+
   // *fetchData* grabs all the data from the source and loads it to a variable called "fetchdata".
   // As a part of the process it transforms the field called "title" to a field called "category". 
   const fetchData = async() => {
     try {
       const json = freshData;
-      // Convert the JSON array with map method.
+      // Convert the JSON array with map method so that "title" becomes "category".
       const convertedMenu = json.menu.map(item => ({
         id: item.id,
         title: item.title,
         description: item.description,
         price: item.price,
         photo: item.photo,
-        category: item.category,
+        category: item.category.title,
       }));
-      console.log(`HomeScreen > fetchData > convertMenu output:`,convertedMenu);
       return convertedMenu;
     } catch (error) {
       Alert.alert(`fectchData - JSON didn't import properly: ${error.message}`);
-      throw error;
     }
   };    
+  
 
+// Convert fetchData's parsed JSON object to 'menuItems' (only if the SQL data pull, getMenuItems, comes up empty) ==
+// The formatted data for SectionList, sectionListData, is assigned to the variable state, *data*.
+// useEffect to refresh menu data from SQLite data base...
+// *menuItems* is invoked to contain all the *fetchData* data pulled from the SQLite 'menuitems' database 
+// via the getMenuItems database function
+
+//OLD CODE
+        // if (!menuItems.length) {
+        //   const menuItems = await fetchData();
+        //   saveMenuItems(menuItems);
+        /*
+        await createTable();
+        let menuItems = await fetchData();
+          saveMenuItems(menuItems);
+
+
+        await createTable();
+        let menuItems = await getMenuItems();
+
+        if (!menuItems.length) {
+          const menuItems = await fetchData();
+          saveMenuItems(menuItems);
+        */
+        // }
+
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await createTable();
+  //       //const menuItems = await fetchData();
+  //       const fetchedMenuItems = await fetchData();
+  //       await saveMenuItems(fetchedMenuItems);
+  //       const sectionListData = getSectionListData(fetchedMenuItems);
+  //       setData(sectionListData);
+  //       setFilteredData(sectionListData);
+  //     } catch (e) {
+  //       // Handle error
+  //       Alert.alert(`HomeScreen useEffect: createTable, fetchData, saveMenuItems, {data}, {filteredData}`,e.message);
+  //     }
+  //   })();
+  // }, [freshData]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await createTable();
+  //       let menuItems = await getMenuItems();
+
+  //       if (!menuItems.length) {
+  //         // If SQLite data is empty, fetch data from remote URL
+  //         const fetchedMenuItems = await fetchData();
+  //         await saveMenuItems(fetchedMenuItems);
+  //         menuItems = fetchedMenuItems;
+  //       }
+
+  //       const sectionListData = getSectionListData(menuItems);
+  //       setData(sectionListData);
+  //       setFilteredData(sectionListData);
+  //     } catch (e) {
+  //       // Handle error
+  //       Alert.alert('HomeScreen useEffect:', e.message);
+  //     }
+  //   })();
+  // }, [freshData]);
+
+
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       // Fetch data from the local JSON file
+  //       const freshData = await fetchData();
+        
+  //       // Clear existing data from SQLite
+  //       await createTable();
+  //       await saveMenuItems([]);
+  
+  //       // Save new data to SQLite
+  //       await saveMenuItems(freshData);
+  
+  //       // Set data for display
+  //       const sectionListData = getSectionListData(freshData);
+  //       setData(sectionListData);
+  //       setFilteredData(sectionListData);
+  //       console.log('useEffect *ONE TIME!* fetchData grab and update SQLite activities');
+  //     } catch (e) {
+  //       // Handle error
+  //       Alert.alert('HomeScreen useEffect:', e.message);
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
-    const fetchDataAndSave = async () => {
+    (async () => {
       try {
-        // Fetch data from the local JSON file, create table, and save new data to SQLite
-        const menuItems = await fetchData();
+        // Fetch data from the local JSON file
+        const freshData = await fetchData();
+        
+        // Clear existing data from SQLite
         await createTable();
-        await clearSQL();
-        await saveMenuItems(menuItems);
+        await saveMenuItems([]);
+  
+        // Save new data to SQLite
+        await saveMenuItems(freshData);
   
         // Set data for display
-        const sectionListData = getSectionListData(menuItems);
+  
+        const sectionListData = getSectionListData(freshData);
         setData(sectionListData);
         setFilteredData(sectionListData); // This line is optional, depending on your needs
-        console.log('HomeScreen > useEffect *ONE TIME!* fetchData grab and populate SQL with JSON file data');
+        console.log('useEffect *ONE TIME!* fetchData grab and update SQLite activities');
       } catch (e) {
+        // Handle error
         Alert.alert('HomeScreen useEffect:', e.message);
       }
-    };
-    fetchDataAndSave();
+    })();
   }, []);
 
 
-  useUpdateEffect(() => {
-    (async () => {
-      try {
-        // Fetch data from the local JSON file, create table, and save new data to SQLite
-        const menuItems = await fetchData();
-        console.log('HomeScreen > useUpdateEffect > const menuItems = await fetchData completed.');
-        //await clearSQL();
-        await saveMenuItems(menuItems);
-        console.log(`DATA UPDATE TRIGGERED. HomeScreen > useUpdateEffect: saveMenuItems(menuItems)`);
-      } catch (e) {
-        Alert.alert('ERROR> HomeScreen useUpdateEffect:', e.message);
+// useUpdateEffect to refresh menu display based on what categories are currently selected/highlighted.
+// useUpdateEffect(() => {
+//   (async () => {
+//     // Trying out the 2 lines of code below to ensure the most recent menu data is being used.
+//     let fetchedMenuItems = await fetchData();
+//     await saveMenuItems(fetchedMenuItems);
+//     const activeCategories = sections.filter((s, i) => {
+//       // If all filters are deselected, all categories are active
+//       if (filterSelections.every((item) => item === false)) {
+//         return true;
+//       }
+//       return filterSelections[i];
+//     });
+//     try {
+//         const menuItems = await filterByQueryAndCategories(
+//         query,
+//         activeCategories
+//       );
+//       const sectionListData = getSectionListData(menuItems);
+//       setData(sectionListData);
+//       setFilteredData(sectionListData);  // Added a new state for filtered data
+//     } catch (e) {
+//       Alert.alert(e.message);
+//     }
+//   })();
+// }, [filterSelections, query]);
+
+useUpdateEffect(() => {
+  const updateData = async () => {
+    const fetchedMenuItems = await fetchData();
+    await saveMenuItems(fetchedMenuItems);
+    const activeCategories = sections.filter((s, i) => {
+      if (filterSelections.every((item) => item === false)) {
+        return true;
       }
-    })();
-  }, [freshData]);
-  
-
-  // const updateFilteredMenu = async (filterSelections, query) => {
-  //   const activeCategories = sections.filter((s, i) => {
-  //     // If all filters are deselected, all categories are active
-  //     if (filterSelections.every((item) => item === false)) {
-  //       console.log(`HomeScreen > useUpdateEffect > activeCategories. App has determined that all items in every {filterSelection} is false.`);
-  //       return true;
-  //     }
-  //     console.log('HomeScreen > useUpdateEffect: System has executed [return filterSelection(i).');
-  //     return filterSelections[i];
-  //   });
-
-  const updateFilteredMenu = async (filterSelections, query) => {
-    const activeCategories = sections.filter((_, i) => filterSelections[i]);  
-
+      return filterSelections[i];
+    });
     try {
-      const filteredMenu = await filterByQueryAndCategories(query,activeCategories);
-      return(filteredMenu);
+      const menuItems = await filterByQueryAndCategories(
+        query,
+        activeCategories
+      );
+      const sectionListData = getSectionListData(menuItems);
+      setData(sectionListData);
+      setFilteredData(sectionListData);
     } catch (e) {
       Alert.alert(e.message);
-      throw e;
     }
   };
 
-
-  useUpdateEffect(() => {
-    const updateMenuItems = async () => {
-      try {
-        const checkMenuItems = await fetchData();
-        await saveMenuItems(checkMenuItems);
-        let menuItems = await updateFilteredMenu(filterSelections, query);
-        console.log(`HomeScreen > useUpdateEffect > updateFilteredMenu`);
-        console.log(`HomeScreen > useUpdateEffect > *menuItems* from filterByQueryAndCategories:`,menuItems);
-        const sectionListData = getSectionListData(menuItems);
-        setData(sectionListData);
-        console.log(`HomeScreen > useUpdateEffect > *sectionListData*:`,sectionListData);
-        console.log(`HomeScreen > useUpdateEffect > *data:`,data);
-        setFilteredData(sectionListData);  // Added a new state for filtered data
-        console.log(`HomeScreen > useUpdateEffect > *sectionListData* sent to setFilterdData:`,sectionListData);
-        console.log(`HomeScreen > useUpdateEffect > *filteredData:`,filteredData);
-      } catch (error) {
-        console.error('HomeScreen > useUpdateEffect > menuItems=updateFilteredMenu', error);
-      }
-    };
-    updateMenuItems();
-  }, [filterSelections, query]);
+  updateData();
+}, [filterSelections, query, freshData]);
 
 
 // *handleFiltersChange* updates the menu data based on the current category selections
@@ -189,7 +275,6 @@ export default function App() {
     arrayCopy[index] = !filterSelections[index];
     setFilterSelections(arrayCopy);
   };
-
 
 // The following 3 declarations appear to be related to the search function.
 // Some of this syntax wasn't taught in previous courses, but get the gist.
@@ -201,7 +286,6 @@ export default function App() {
     setSearchBarText(text);
     debouncedLookup(text);
   };
-
 
 // UI display elements
   return (
@@ -254,41 +338,40 @@ export default function App() {
 
       </View>
 
-       
-      <View style={styles.menuContentContainer}>
-        <Searchbar
-          placeholder="Search"
-          placeholderTextColor="gray"
-          onChangeText={handleSearchChange}
-          value={searchBarText}
-          style={styles.searchBar}
-          iconColor="gray"
-          inputStyle={{ color: 'black' }}
-          elevation={0}
-          autoCapitalize='none'
-          onBlur={() => {Keyboard.dismiss();}}
-        />
-        <Filters
-          selections={filterSelections}
-          onChange={handleFiltersChange}
-          sections={sections}
-        />
-        <SectionList
-          style={styles.sectionList}
-          sections={filteredData}
-
-          //keyExtractor={(item, index) => item.id || index.toString()}
-          keyExtractor={(item) => item.id} // Update keyExtractor to use item.id  ***TEST CONDITION***
-  
-          renderItem={({ item }) => (
-            <Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
-          )}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.header}>{title}</Text>
-          )}
-        />
-      </View> 
-      
+<View style={styles.menuContentContainer}>
+      <Searchbar
+        placeholder="Search"
+        placeholderTextColor="gray"
+        onChangeText={handleSearchChange}
+        value={searchBarText}
+        style={styles.searchBar}
+        iconColor="gray"
+        inputStyle={{ color: 'black' }}
+        elevation={0}
+        autoCapitalize='none'
+        onBlur={() => {Keyboard.dismiss();}}
+      />
+      <Filters
+        selections={filterSelections}
+        onChange={handleFiltersChange}
+        sections={sections}
+      />
+      <SectionList
+        style={styles.sectionList}
+        sections={filteredData}
+        //keyExtractor={(item, index) => item.id || index.toString()}
+        keyExtractor={(item) => item.id} // Update keyExtractor to use item.id
+ 
+        renderItem={({ item }) => (
+          <Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
+          //<Item title={item.title} price={item.price} />
+          //<Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.header}>{title}</Text>
+        )}
+      />
+    </View>
     </SafeAreaView>
   );
 }
@@ -300,14 +383,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
 
-  // TESTDATA CONTAINER
-  testContentContainer: {
-    flex: 1,
-    //width: '100%',
-    //height: '100%',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 4,
-},
+
 // MENU CONTAINERS - For menu content
   menuContentContainer: {
     flex: 1,
@@ -369,7 +445,7 @@ const styles = StyleSheet.create({
 
 // CONTAINERS - For leading content
   leadContentContainer: {
-    flex: 1,
+    flex: 0.95,
     width: '100%',
     //alignItems: 'center',
     //justifyContent: 'center',
