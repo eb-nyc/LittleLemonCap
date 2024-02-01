@@ -6,7 +6,7 @@ import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AvatarPicker from '../utils/AvatarPicker';
-import HomeScreen from '../screens/HomeScreen';
+import HomeScreen from './HomeScreen';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 
