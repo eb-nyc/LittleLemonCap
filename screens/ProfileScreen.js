@@ -12,6 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen({navigation}) {
 
+/*
+import AuthContext from '../AuthContext';
+const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
+*/
+
   // GENERAL SCREEN VARIABLES
     const pressableInputRef = useRef(); //Ref to store reference to current Pressable
     const [fontLoaded, setFontLoaded] = useState(false);
@@ -636,7 +641,7 @@ const saveUserEmail = async () => {
             clearButtonMode='while-editing'
             autoCapitalize='none'
             autoCorrect={false}
-            enterKeyHint='send'
+            enterKeyHint='next'
             onSubmitEditing={handleEmailReturn}
             ref={emailInputRef}
           />

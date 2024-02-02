@@ -10,6 +10,7 @@ import {
   Keyboard,
   ScrollView,
   Image,
+  Pressable,
 } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import debounce from 'lodash.debounce';
@@ -21,6 +22,7 @@ import {
   filterByQueryAndCategories,
 } from '../database';
 import Filters from '../components/Filters';
+import { Menu, TestComponent } from '../components/Menu';
 import { getSectionListData, useUpdateEffect } from '../utils';
 //Import menu data from a resident file
 import freshData from '../assets/little-lemon-menu.json'
@@ -74,6 +76,7 @@ export default function App() {
     sections.map(() => false)
   );
   const [filteredData, setFilteredData] = useState([]);
+  const [categoryIndex, setCategoryIndex] = useState(0);
 
   // *fetchData* grabs all the data from the source and loads it to a variable called "fetchdata".
   // As a part of the process it transforms the field called "title" to a field called "category". 
@@ -136,16 +139,6 @@ export default function App() {
   }, [freshData]);
   
 
-  // const updateFilteredMenu = async (filterSelections, query) => {
-  //   const activeCategories = sections.filter((s, i) => {
-  //     // If all filters are deselected, all categories are active
-  //     if (filterSelections.every((item) => item === false)) {
-  //       console.log(`HomeScreen > useUpdateEffect > activeCategories. App has determined that all items in every {filterSelection} is false.`);
-  //       return true;
-  //     }
-  //     console.log('HomeScreen > useUpdateEffect: System has executed [return filterSelection(i).');
-  //     return filterSelections[i];
-  //   });
 
   const updateFilteredMenu = async (filterSelections, query) => {
     const activeCategories = sections.filter((_, i) => filterSelections[i]);  
@@ -183,14 +176,6 @@ export default function App() {
   }, [filterSelections, query]);
 
 
-// *handleFiltersChange* updates the menu data based on the current category selections
-  const handleFiltersChange = async (index) => {
-    const arrayCopy = [...filterSelections];
-    arrayCopy[index] = !filterSelections[index];
-    setFilterSelections(arrayCopy);
-  };
-
-
 // The following 3 declarations appear to be related to the search function.
 // Some of this syntax wasn't taught in previous courses, but get the gist.
   const lookup = useCallback((q) => {
@@ -206,89 +191,54 @@ export default function App() {
 // UI display elements
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.leadContentContainer}>
-        <Text style={styles.displayTitleMarkazi}>
-          Little Lemon
-        </Text>
-        <Text style={styles.headTitleMarkazi}>
-          Chicago
-        </Text>
-
-      <View style={styles.leadDescriptionContainer}>
-        <View style={styles.descTextContainer}>
-          <Text style={styles.descTextKarla}> 
-          We are a family-owned Mediterranean restaurant, 
-          focused on traditional recipes served with a modern twist.
-          </Text>
-
-          <View 
-            style={styles.leadButton}
-            onPress={''}
-          >
-            <Text style={styles.abbreviationKarla}>
-              Make a Reservation
-            </Text>
-          </View> 
-
-          <View 
-            style={styles.leadButton}
-            onPress={''}
-          >
-            <Text style={styles.abbreviationKarla}>
-              Order Delivery
-            </Text>
-          </View> 
-
-          
+      <ScrollView  style={styles.container}>
+        <>
+        <View style={styles.leadContentContainer}>
+          <Text style={styles.displayTitleMarkazi}>Little Lemon</Text>
+          <Text style={styles.headTitleMarkazi}>Chicago</Text>
+          <View style={styles.leadDescriptionContainer}>
+           <View style={styles.descTextContainer}>
+               <Text style={styles.descTextKarla}> 
+              We are a family-owned Mediterranean restaurant, 
+              focused on traditional recipes served with a modern twist.
+              </Text>
+              <View style={styles.leadButton} onPress={''}>
+                <Text style={styles.abbreviationKarla}>Make a Reservation</Text>
+              </View> 
+              <View style={styles.leadButton} onPress={''}>
+                <Text style={styles.abbreviationKarla}>Order Delivery</Text>
+              </View>
+            </View> 
+            <View style={styles.descImageContainer}>
+              <Image
+                style={styles.descImage}
+                source={require('../assets/photo-hero-LL-sm.jpg')}
+                //resizeMode="cover"
+                accessible={true}
+                accessibilityLabel={'Food tray presenting sample of foods'}
+              />
+            </View>
+          </View>
         </View>
-        <View style={styles.descImageContainer}>
-          <Image
-            style={styles.descImage}
-            source={require('../assets/photo-hero-LL-sm.jpg')}
-            //resizeMode="cover"
-            accessible={true}
-            accessibilityLabel={'Food tray presenting sample of foods'}
+
+        <View style={styles.menuContentContainer}>
+          <Searchbar
+            placeholder="Search"
+            placeholderTextColor="gray"
+            onChangeText={handleSearchChange}
+            value={searchBarText}
+            style={styles.searchBar}
+            iconColor="gray"
+            inputStyle={{ color: 'black' }}
+            // elevation={0}
+            autoCapitalize='none'
+            onBlur={() => {Keyboard.dismiss();}}
           />
-        </View>
-      </View>
+          <Menu/>
 
-      </View>
-
-       
-      <View style={styles.menuContentContainer}>
-        <Searchbar
-          placeholder="Search"
-          placeholderTextColor="gray"
-          onChangeText={handleSearchChange}
-          value={searchBarText}
-          style={styles.searchBar}
-          iconColor="gray"
-          inputStyle={{ color: 'black' }}
-          elevation={0}
-          autoCapitalize='none'
-          onBlur={() => {Keyboard.dismiss();}}
-        />
-        <Filters
-          selections={filterSelections}
-          onChange={handleFiltersChange}
-          sections={sections}
-        />
-        <SectionList
-          style={styles.sectionList}
-          sections={filteredData}
-
-          //keyExtractor={(item, index) => item.id || index.toString()}
-          keyExtractor={(item) => item.id} // Update keyExtractor to use item.id  ***TEST CONDITION***
-  
-          renderItem={({ item }) => (
-            <Item title={item.title} description={item.description} price={item.price} photo={item.photo} />
-          )}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.header}>{title}</Text>
-          )}
-        />
-      </View> 
-      
+        </View> 
+        </>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -296,25 +246,43 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight,
+    flexDirection: 'column',
     backgroundColor: '#FFF',
+    alignContent: 'flex-start',
   },
 
-  // TESTDATA CONTAINER
-  testContentContainer: {
-    flex: 1,
-    //width: '100%',
-    //height: '100%',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 4,
-},
 // MENU CONTAINERS - For menu content
   menuContentContainer: {
     flex: 1,
+    flexDirection: 'column',
+    alignContent: 'flex-start',
     width: '100%',
-    height: 340,
+    //height: 340,
     backgroundColor: '#FFF',
     paddingHorizontal: 25,
+  },
+  categoriesContainer: {
+    //flex: 0.2,
+    height: 40,
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: 'black',
+  },
+  categoryCellContainer: {
+    //flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: '6.6%',
+    paddingVertical: 7,
+    backgroundColor: 'white',
+    borderWidth: 0.5,
+    borderColor: 'black',
+    overflow: 'hidden',
   },
   sectionList: {
     paddingHorizontal: 0,
@@ -350,7 +318,6 @@ const styles = StyleSheet.create({
     //justifyContent: 'center',
   },
   itemPhoto: {
-    //flex: 0.35,
     width: 133,
     height: 100,
     borderRadius: 16,
@@ -370,7 +337,8 @@ const styles = StyleSheet.create({
 // CONTAINERS - For leading content
   leadContentContainer: {
     flex: 1,
-    width: '100%',
+    // width: '100%',
+    // height: '30%',
     //alignItems: 'center',
     //justifyContent: 'center',
     backgroundColor: '#435F57',
@@ -383,31 +351,47 @@ const styles = StyleSheet.create({
   leadDescriptionContainer: {
     flex: 1,
     width: '100%',
+    // height: '30%',
     flexDirection: 'row',
-    alignItems: 'flex-start',
     marginBottom: 16,
+    marginRight: 8,
     marginTop: 4,
+    padding: 0,
   },
   descTextContainer: {
-    flex: 0.5,
+    flex: 1,
     flexDirection: 'column',
-    paddingRight: 12,
-    //alignItems: 'flex-start',
-    //justifyContent: 'center',
+    marginRight: 12,
   },
   descImageContainer: {
-    flex: 0.5,
-    //width: 147,
-    //height: 160,
-    //alignItems: 'flex-start',
-    //justifyContent: 'center',
+    width: 143,
+    height: 210,
     borderRadius: 16,
     backgroundColor: 'white',
     overflow: 'hidden',
-    //marginBottom: 10,
+    alignContent: 'center',
   },
 
 // FONTS
+  displayTitleMarkazi: {
+    fontSize: 64,
+    fontFamily: "MarkaziText",
+    marginBottom: -18,
+    color: '#F4CE14',
+    textAlign: 'left',
+  },
+  headTitleMarkazi: {
+    fontSize: 40,
+    fontFamily: "MarkaziText",
+    color: 'white',
+    textAlign: 'left',
+  },
+  categoryText: {
+      fontSize: 18,
+      color: 'black',
+      fontFamily: "Karla",
+      //textAlign: 'center',
+  },
   title: {
     fontSize: 18,
     color: 'black',
@@ -416,22 +400,6 @@ const styles = StyleSheet.create({
   foodDescription: {
     fontSize: 14,
     color: 'black',
-  },
-  displayTitleMarkazi: {
-    fontSize: 64,
-    fontFamily: "MarkaziText",
-    padding: 0,
-    marginBottom: -18,
-    color: '#F4CE14',
-    textAlign: 'left',
-  },
-  headTitleMarkazi: {
-    fontSize: 40,
-    fontFamily: "MarkaziText",
-    padding: 0,
-    marginVertical: 0,
-    color: 'white',
-    textAlign: 'left',
   },
   descTextKarla: {
     fontSize: 16,
@@ -450,7 +418,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     marginVertical: 0,
     alignSelf: 'center',
-    fontWeight: '900',
     color: 'black',
     textAlign: 'center',
   },
@@ -461,14 +428,6 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     alignSelf: 'center',
-    //borderRadius: 16,
-    resizeMode: 'cover',
-  },
-  foodImage: {
-    width: '100%',
-    flex: 1,
-    alignSelf: 'center',
-    //borderRadius: 16,
     resizeMode: 'cover',
   },
   leadButton: {
