@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Pressable, Image } from 'react-native';
+import { View, Text, Pressable, Image, Alert } from 'react-native';
 import * as Font from 'expo-font';
 import styles from '../styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +9,7 @@ import AuthContext from '../AuthContext';
 
 /*
 import AuthContext from '../AuthContext';
-const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
+const { contextFirstName, contextLastName, avatarStored } = React.useContext(AuthContext); //Context hook variable for routing
 */
 
 export const HeaderLogo = () => {
@@ -31,7 +31,7 @@ export const NameAbbreviation = () => {
     const [userAvatar, setUserAvatar] = useState(null);
     const navigation = useNavigation();
     const pressableProfileRef = useRef(); //Ref to store reference to current Pressable
-    const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
+    const { contextFirstName, contextLastName, avatarStored } = React.useContext(AuthContext); //Context hook variable for routing
 
 
     // Function to load up the necessary fonts
@@ -60,31 +60,6 @@ export const NameAbbreviation = () => {
         setAbbreviation(abbreviationResult);
     };
 
-/*
-    const fetchNames = async () => {
-        let userFirstName;
-        let userLastName;
-        try {
-            // Retrieve userFirstName and userLastName from AsyncStorage
-            userFirstName = await AsyncStorage.getItem('userFirstName');
-            userLastName = await AsyncStorage.getItem('userLastName');
-        } catch (error) {
-            console.error('Error fetching data abbreviations from AsyncStorage:', error);
-        } finally {
-            // Extract the first letter of userFirstName and the first letter of userLastName
-            const firstLetter = userFirstName ? userFirstName.charAt(0) : '?';
-            const secondLetter = userLastName ? userLastName.charAt(0) : '?';
-
-            // Combine the letters to form the two-letter abbreviation
-            const abbreviationResult = firstLetter + secondLetter;
-
-            // Update the state with the abbreviation
-            setAbbreviation(abbreviationResult);
-        };
-    };
-*/
-
-
     // Use the useEffect hook to fetch abbreviations when the component mounts or when the fonts are loaded
     useEffect(() => {
         if (fontLoaded) {
@@ -100,16 +75,20 @@ export const NameAbbreviation = () => {
 
 
 //Return the Text component with the abbreviation
-if (userAvatar) {
+if (avatarStored) {
     return (
-        <View style={styles.headerIconContainer}>
+        <Pressable 
+        ref={pressableProfileRef}
+        style={styles.headerIconContainerContainer}
+        onPress={() => navigation.navigate('Profile')}
+        >
             <Image
-                source={{ uri: userAvatar }}
-                resizeMode="contain"
+                style={styles.headerAvatarContainer}
+                source={require('../assets/profile-image.png')}
                 accessible={true}
-                accessibilityLabel={'Avatar image of you!'}
+                accessibilityLabel={'Placeholder for the avatar image of the user.'}
             />
-        </View>
+        </Pressable>
     );
 } else if (abbreviation) {
     return (
@@ -139,13 +118,26 @@ export const HeaderButtons = () => {
                 </Text>
             </Pressable>
             <NameAbbreviation />
-            <Image
-                source={require('../assets/shoppingbag-bw.png')}
-                style={styles.headerButton}
-                resizeMode="contain"
-                accessible={true}
-                accessibilityLabel={'Shopping Bag'}
-            />
+            <Pressable onPress={infoShopping}>
+                <Image
+                    source={require('../assets/shoppingbag-bw.png')}
+                    style={styles.headerButton}
+                    resizeMode="contain"
+                    accessible={true}
+                    accessibilityLabel={'Shopping Bag'}
+                />
+            </Pressable>
+            {/*
+            <Pressable onPress={infoShopping}>
+                <Image
+                    source={require('../assets/shoppingbag-bw.png')}
+                    style={styles.headerButton}
+                    resizeMode="contain"
+                    accessible={true}
+                    accessibilityLabel={'Shopping Bag'}
+                />
+            </Pressable>
+            */}
         </View>
     );
   };
@@ -166,3 +158,12 @@ export const HeaderButtons = () => {
 //        </View>
     );
   };
+
+  const infoShopping = () => {
+    Alert.alert(
+      "Placeholder Only",
+      "In a full app, this would link to the user's shopping cart and display current order information.",
+      [{ text: "Ok"}]
+    );
+  };
+

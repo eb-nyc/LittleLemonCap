@@ -1,147 +1,58 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import AuthContext from '../AuthContext';
-import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, SafeAreaView, ScrollView, Keyboard} from 'react-native';
+import {View, KeyboardAvoidingView, Text, TextInput, Image, Pressable, Alert, Platform, ScrollView, Keyboard} from 'react-native';
 import { validateEmail, validateName, validatePhone } from '../utils';
 import styles from '../styles/styles';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AvatarPicker from '../utils/AvatarPicker';
-import HomeScreen from './HomeScreen';
-import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen({navigation}) {
-
-/*
-import AuthContext from '../AuthContext';
-const { contextFirstName, contextLastName } = React.useContext(AuthContext); //Context hook variable for routing
-*/
 
   // GENERAL SCREEN VARIABLES
     const pressableInputRef = useRef(); //Ref to store reference to current Pressable
     const [fontLoaded, setFontLoaded] = useState(false);
-    const { signOut, updateFirstName, updateLastName } = useContext(AuthContext);
-    const [contextFirstName, setContextFirstName] = React.useState(''); //React Context variable to hold first name
-    const [contextLastName, setContextLastName] = React.useState(''); //React Context variable to hold last name
-  // ALL VARIABLES RELATED TO THE AVATAR IMAGE MANAGMENT
-    const [avatarOnFile, setAvatarOnFile] = useState(false);
-    const [userAvatar, setUserAvatar] = useState(require('../assets/profile-ph.png'));
+    const { signOut, updateFirstName, updateLastName, deleteFirstName, deleteLastName, avatarStored, avatarOn, avatarOff } = useContext(AuthContext);
   // ALL VARIABLES RELATED TO THE EMAIL ADDRESS
     const [email, onChangeEmail] = useState(''); //variable state = email text string submitted by user into TextInput
-    const [subscribed, setSubscribed] = useState(false);  //variable state = if user has already submitted valid email
     const [validEmail, setValidEmail] = useState(false); //variable state = if text in input field is a valid format per validateEmail function
     const emailInputRef = useRef();   //Ref to store reference to TextInput component
-    const [displayEmail, setDisplayEmail] = useState('');
   // ALL VARIABLES RELATED TO THE FIRST NAME
     const [firstName, onChangeFirstName] = useState(''); //variable state = email text string submitted by user into TextInput
     const [validFirstName, setValidFirstName] = useState(false); //variable state = if text in input field is a valid format per validateName function
     const firstNameInputRef = useRef();   //Ref to store reference to TextInput component
-    const [displayFirstName, setDisplayFirstName] = useState('');
   // ALL VARIABLES RELATED TO THE LAST NAME
     const [lastName, onChangeLastName] = useState(''); //variable state = email text string submitted by user into TextInput
     const [validLastName, setValidLastName] = useState(false); //variable state = if text in input field is a valid format per validateName function
     const lastNameInputRef = useRef();   //Ref to store reference to TextInput component
-    const [displayLastName, setDisplayLastName] = useState('');
   // ALL VARIABLES RELATED TO THE PHONE NUMBER
     const [phone, onChangePhone] = useState(''); //variable state = phone text string submitted by user into TextInput
     const phoneInputRef = useRef();   //Ref to store reference to TextInput component
-    const [displayphone, setDisplayPhone] = useState('');
     const [validPhone, setValidPhone] = useState(false); //variable state = user has submitted valid phone no.
   // ALL VARIABLES RELATED TO EMAIL NOTIFICATION OPTIONS
     const [promoChecked, setPromoChecked] = useState(true);
     const [newsChecked, setNewsChecked] = useState(true);
-  // ALL VARIABLES RELATED TO UNDO AND LOGOUT BUTTONS
-    const [onboard, setOnboard] = useState(true);
   // ALL VARIABLES RELATED TO THE MAIN BUTTON
     const [pressState, setPressState] = useState(false); //variable state = main button currently pressed?
 
 
-
-  // Function to transfer userIMAGE from AsyncStorage when component renders.
-  const loadUserAvatar = async () => {
-    try {
-      const userAvatarURI = await AsyncStorage.getItem('userImage');
-      if (userAvatarURI) {
-        // setUserAvatar(userAvatarURI);
-        console.log(`Found userImage in AsyncStorage!`);
-        const parsedUserAvatar = JSON.parse(userAvatarURI);
-        console.log(`Parsed userImage loaded from AsyncStorage and saved as userAvatar.`);
-        setAvatarOnFile(true);
-        setUserAvatar(parsedUserAvatar);
-      } else {
-        console.log(`Unable to use loadUserAvatar to get userImage from AsyncStorage.`);
-        setAvatarOnFile(false);
-      }
-    } catch (e) {
-      console.error(`Error loading user image:`,e);
-    }
+  const AvatarPortrait = () => {
+    return(
+      <>
+      {avatarStored ? (
+        <Image
+            source={require('../assets/profile-image.png')}
+            style={styles.blankAvatarContainer}
+            resizeMode="contain"
+            accessible={true}
+            accessibilityLabel={'Placeholder for the avatar image of the user'}
+        />
+      ) : (
+        <View style={styles.blankAvatarContainer} />
+      )}
+      </>
+    );
   };
 
-  useEffect(() => {
-    loadUserAvatar();
-    console.log(`-- useEffect (ProfileScreen.js - loadUserAvatar) --`);
-  }, []);
-
-
-  // Function to save user image to AsyncStorage as {userImage}.
-  const saveAvatarImage = async (imageURI) => {
-    try {
-      await AsyncStorage.setItem('userImage', JSON.stringify(imageURI));
-      console.log(`Saving stringifyd version of imageURI to AsyncStorage.`);
-    } catch (e) {
-      console.error(`Error saving userAvatar to AsyncStorage: `,e);
-    }
-  };
-
-
-  // Function to upload image from device
-  const handleChangeAvatar = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (!result.cancelled) {
-      setUserAvatar(result.uri);
-      // Save the new image URI to AsyncStorage
-      saveAvatarImage(result.uri);
-    }
-  };
-
-
-  // Function to remove user image from AsyncStorage
-  const removeUserAvatar = async () => {
-    try {
-      await AsyncStorage.removeItem('userImage');
-      console.log('User image removed from AsyncStorage.');
-      setAvatarOnFile(false);
-      setUserAvatar(require('../assets/profile-ph.png'));
-    } catch (e) {
-      console.error('Error removing user image from AsyncStorage: ', e);
-    }
-  };
-  
-  // Function to display and save a default image for userAvatar.
-  const saveDefaultAvatar = () => {
-    setUserAvatar(require('../assets/profile-image.png'));
-    console.log('Message to confirm the saveDefaultAvatar function is running.');
-  };
-  
-  useEffect(() => {
-    console.log(`useEffect -- saveUserAvatar(userAvatar) -- Saving userAvatar to AsyncStorage.`);
-    saveAvatarImage(userAvatar);
-  }, [userAvatar]);
-
-
-  const loadDefaultAvatar = () => {
-    // Load the default avatar image
-    console.log ('Message to confirm the loadDefaultAvatar function is running.');
-    //setUserAvatar(require('../assets/profile-image.png'));
-    setUserAvatar('../assets/profile-image.png');
-    // saveAvatarImage();
-    // loadUserAvatar();
-  };
 
   // Function to handle the "Change" button and show the alert
   const changeAvatar = () => {
@@ -149,13 +60,12 @@ const { contextFirstName, contextLastName } = React.useContext(AuthContext); //C
       Alert.alert(
         "Photo Selection Disabled",
         "The mobile simulator didn't allow photo selection from the device, so this button just loads the provided profile picture.",
-        [{ text: "OK", onPress: saveDefaultAvatar }]
-        //[{ text: "OK", onPress: () => console.log('Confirm Change Button press works.') }]
+        [{ text: "OK", onPress: avatarOn }]
       );
+      //console.log(`ProfileScreen > Context value of avatarStored is:`,avatarStored);
     };
     showAlert();
   };
-
 
 
   // Function to transfer device's user email from AsyncStorage when this component renders.
@@ -164,7 +74,6 @@ const { contextFirstName, contextLastName } = React.useContext(AuthContext); //C
       const userEmailString = await AsyncStorage.getItem('userEmail');
       if (userEmailString !== null) {
         onChangeEmail(userEmailString);
-        setDisplayEmail(userEmailString);
         setValidEmail(true);
       }
     } catch (e) {
@@ -182,7 +91,6 @@ const { contextFirstName, contextLastName } = React.useContext(AuthContext); //C
       const userFirstNameString = await AsyncStorage.getItem('userFirstName');
       if (userFirstNameString !== null) {
         onChangeFirstName(userFirstNameString);
-        setDisplayFirstName(userFirstNameString);
         setValidFirstName(true);
       }
     } catch (e) {
@@ -200,7 +108,6 @@ const { contextFirstName, contextLastName } = React.useContext(AuthContext); //C
       const userLastNameString = await AsyncStorage.getItem('userLastName');
       if (userLastNameString !== null) {
         onChangeLastName(userLastNameString);
-        setDisplayLastName(userLastNameString);
         setValidLastName(true);
       }
     } catch (e) {
@@ -232,7 +139,7 @@ const { contextFirstName, contextLastName } = React.useContext(AuthContext); //C
 const saveUserEmail = async () => {
     try {
     await AsyncStorage.setItem('userEmail', email);
-    console.log(`AsyncStorage userEmail updated to`,email);
+    //console.log(`ProfileScreen.js > saveUseremail > AsyncStorage userEmail updated to`,email);
     } catch (e) {
     console.error(`Error saving user email: `,e);
     }
@@ -242,7 +149,7 @@ const saveUserEmail = async () => {
   const removeEmail = async () => {
     try {
       await AsyncStorage.removeItem('userEmail');
-      console.log('User email removed from AsyncStorage.');
+      //console.log('ProfileScreen > removeEmail > User email removed from AsyncStorage.');
       setValidEmail(false);
       onChangeEmail('');
     } catch (e) {
@@ -251,51 +158,26 @@ const saveUserEmail = async () => {
   };
 
 
-
-  // Function to save new user-provided first name to AsyncStorage
-  const saveFirstName = async () => {
-    try {
-    await AsyncStorage.setItem('userFirstName', firstName);
-    console.log(`AsyncStorage userFirstName updated to`,firstName);
-    } catch (e) {
-    console.error(`Error saving first name to AsyncStorage: `,e);
-    }
-  };
-
   // Function to remove first name from AsyncStorage
   const removeFirstName = async () => {
     try {
-      await AsyncStorage.removeItem('userFirstName');
-      console.log('User first name removed from AsyncStorage.');
+      await deleteFirstName();
       setValidFirstName(false);
       onChangeFirstName('');
-      await setContextFirstName('');
     } catch (e) {
-      console.error('Error removing user first name from AsyncStorage: ', e);
+      console.error('ProfileScreen > Error removing user first name from AsyncStorage: ', e);
     }
   };
 
-
-  // Function to save new user-provided last name to AsyncStorage
-  const saveLastName = async () => {
-    try {
-    await AsyncStorage.setItem('userLastName', lastName);
-    console.log(`AsyncStorage userLastName updated to`,lastName);
-    } catch (e) {
-    console.error(`Error saving last name to AsyncStorage: `,e);
-    }
-  };
 
   // Function to remove last name from AsyncStorage
   const removeLastName = async () => {
     try {
-      await AsyncStorage.removeItem('userLastName');
-      console.log('User last name removed from AsyncStorage.');
+      await deleteLastName();
       setValidLastName(false);
       onChangeLastName('');
-      await setContextLastName('');
     } catch (e) {
-      console.error('Error removing user last name from AsyncStorage: ', e);
+      console.error('ProfileScreen > Error removing user last name from AsyncStorage: ', e);
     }
   };
 
@@ -304,7 +186,7 @@ const saveUserEmail = async () => {
   const savePhone = async () => {
     try {
     await AsyncStorage.setItem('userPhone', phone);
-    console.log(`AsyncStorage userPhone updated to`,phone);
+    //console.log(`ProfileScreen.js > savePhone > AsyncStorage userPhone updated to`,phone);
     } catch (e) {
     console.error(`Error saving phone number to AsyncStorage: `,e);
     }
@@ -314,14 +196,13 @@ const saveUserEmail = async () => {
   const removePhone = async () => {
     try {
       await AsyncStorage.removeItem('userPhone');
-      console.log('User phone number removed from AsyncStorage.');
+      //console.log('ProfileScreen > removePhone > User phone number removed from AsyncStorage.');
       setValidPhone(false);
       onChangePhone('');
     } catch (e) {
       console.error('Error removing user phone number from AsyncStorage: ', e);
     }
   };
-
 
 
   // function to determine if enteredPhone is a valid format per <validatePhone /> and return true/false value for {setValidPhone}.
@@ -337,7 +218,6 @@ const saveUserEmail = async () => {
   };
   
   // function to determine which prompt should be presented to user depending if text in the input area  
-  // is a valid email (validEmail) and if an email was already provided (subscribed).
   const processPhoneSubmission = () => {
     {(!validPhone || phone == '' || phone == null) && (
       handleInvalidPhone() )}
@@ -361,7 +241,6 @@ const saveUserEmail = async () => {
   };
   
 
-
   // function to load up the necessary fonts
   useEffect(() => {
     async function loadFont() {
@@ -383,23 +262,15 @@ const saveUserEmail = async () => {
     Alert.alert('Please provide a valid email address'); 
   };
 
-  // function to alert user that the submitted information has been accepted
-  const handleNewSubscription = () => {
-    Alert.alert(`Welcome to the Club!`); 
-    setSubscribed(true); 
-    dismissKeyboard(); 
-    //onChangeEmail(''); 
-    };
+
 
   // function to alert user that their email address as been updated with the submitted email
   const handleEmailUpdate = () => {
-    setSubscribed(true); 
     dismissKeyboard();
     phoneInputRef.current.focus(); 
     }
 
   // function to determine which prompt should be presented to user depending if text in the input area  
-  // is a valid email (validEmail) and if an email was already provided (subscribed).
   const processEmailSubmission = () => {
     {(!validEmail || email == '' || email == null) && (
       handleInvalidEmail() )}
@@ -433,14 +304,9 @@ const saveUserEmail = async () => {
   // function to determine if text entered by user(enteredFirstName) is a valid format per <validateName> 
   // and return true/false value for (validFirstName) and update the firstName variable state
   const reviewFirstNameEntry = (enteredFirstName) => {
-    // if (enteredFirstName.length < firstName.length) {
-    //   const firstNameIsValid = validateName(firstName);
-    //   setValidFirstName(firstNameIsValid);
-    // } else {
       const firstNameIsValid = validateName(enteredFirstName);
       setValidFirstName(firstNameIsValid);
       onChangeFirstName(enteredFirstName);
-      setContextFirstName(enteredFirstName);
     // }
   };
 
@@ -450,7 +316,6 @@ const saveUserEmail = async () => {
     const lastNameIsValid = validateName(enteredLastName);
     setValidLastName(lastNameIsValid);
     onChangeLastName(enteredLastName);
-    setContextLastName(enteredLastName);
   };
 
   // function to determine which prompt should be presented to user depending if text in the input area  
@@ -508,7 +373,6 @@ const saveUserEmail = async () => {
   // function to manage all updates when Undo Changes button is pressed
   const undoChanges = () => {
       dismissKeyboard();
-      loadUserAvatar();
       loadFirstName();
       loadLastName();
       loadUserEmail();
@@ -523,12 +387,11 @@ const saveUserEmail = async () => {
   // function to manage all updates when Logout button is pressed
   const logout = () => {
     dismissKeyboard();
-    removeUserAvatar();
+    avatarOff();
     removeFirstName();
     removeLastName();
     removeEmail();
     removePhone();
-    setOnboard(false);
     saveOnboardStatus();
     setTimeout(() => {
     }, 1000);
@@ -539,9 +402,6 @@ const saveUserEmail = async () => {
     // function to manage all updates when Save & Exit button is pressed
     const saveAndExit = async () => {
         Keyboard.dismiss();
-        //saveAvatarImage(userAvatar);
-        //saveFirstName();
-        //saveLastName(); 
         await updateFirstName(firstName);
         await updateLastName(lastName);
         saveUserEmail();
@@ -554,8 +414,6 @@ const saveUserEmail = async () => {
       Alert.alert('Valid email and first & last name are required.'); 
     };
 
-    const testImageVar = require('../assets/profile-image.png');
-    const testImagePath = '../assets/shoppingbag-bw.png';
 
   // ***  MAIN UI LAYOUT  *** 
   return (
@@ -571,16 +429,11 @@ const saveUserEmail = async () => {
         <Text style={styles.cardtitleKarla}>Avatar:</Text> 
         <Text style={styles.cardcaptionKarla}> (optional)</Text>
       </View>
+
+
       <View style={styles.avatarEditContainer}>
         <View style={styles.avatarButtonContainer}>
-              <Image
-                style={styles.blankAvatarContainer}
-                source={userAvatar}
-                resizeMode="contain"
-                accessible={true}
-                accessibilityLabel={'Avatar image of you!'}
-              />
-
+          <AvatarPortrait />
           <Pressable 
             style={styles.profileAvatarButton}
             onPress={changeAvatar}
@@ -592,7 +445,7 @@ const saveUserEmail = async () => {
 
           <Pressable 
             style={styles.profileAvatarButton}
-            onPress={removeUserAvatar}
+            onPress={avatarOff}
           >
             <Text style={styles.abbreviationKarla}>
                 Remove

@@ -55,7 +55,7 @@ export default function OnboardingScreen({navigation}) {
   const saveFirstName = async () => {
     try {
     await AsyncStorage.setItem('userFirstName', firstName.toString());
-    console.log(`AsyncStorage record for {userFirstName} updated to`,firstName.toString());
+    //console.log(`OnboardingScreen > saveFirstName > AsyncStorage record for {userFirstName} updated to`,firstName.toString());
     } catch (e) {
     console.error(`Error saving first name to AsyncStorage: `,e);
     }
@@ -88,7 +88,7 @@ export default function OnboardingScreen({navigation}) {
   const saveLastName = async () => {
     try {
     await AsyncStorage.setItem('userLastName', lastName.toString());
-    console.log(`AsyncStorage record for {userLastName} updated to`,lastName.toString());
+    //console.log(`OnboardingScreen > saveLastName > AsyncStorage record for {userLastName} updated to`,lastName.toString());
     } catch (e) {
     console.error(`Error saving last name to AsyncStorage: `,e);
     }
@@ -120,7 +120,7 @@ export default function OnboardingScreen({navigation}) {
 const saveUserEmail = async () => {
     try {
     await AsyncStorage.setItem('userEmail', email.toString());
-    console.log(`AsyncStorage record for {userEmail} updated to`,email);
+    //console.log(`OnboardingScreen > saveUserEmail > AsyncStorage record for {userEmail} updated to`,email);
     } catch (e) {
     console.error(`Error saving user profile: `,e);
     }

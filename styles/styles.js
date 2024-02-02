@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
         marginBottom: 11,
         borderRadius: 20,
+        resizeMode: 'contain',
     },
     pageContainer: {
       flex: 1,
@@ -213,7 +214,17 @@ const styles = StyleSheet.create({
         marginBottom: 0,
         borderRadius: 40,
       },
-    transparentAvatarContainer: {
+      headerAvatarContainer: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        marginRight: 8,
+        marginBottom: 0,
+        borderRadius: 20,
+      },
+      transparentAvatarContainer: {
         width: 80,
         height: 80,
         alignItems: 'center',
