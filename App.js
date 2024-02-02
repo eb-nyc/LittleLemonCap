@@ -2,7 +2,7 @@ import * as React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import RootNavigator from './navigators/RootNavigator';
-import { loadOnboardingCompleted } from './utils';
+import { loadAvatarStoredStatus, loadOnboardingCompleted } from './utils';
 import AuthContext from './AuthContext';
 
 
@@ -10,11 +10,14 @@ export default function App({ navigation }) {
   const [isOnboardingCompleted, setIsOnboardingCompleted] = React.useState(false);
   const [contextFirstName, setContextFirstName] = React.useState(''); //React Context variable to hold first name
   const [contextLastName, setContextLastName] = React.useState(''); //React Context variable to hold last name
+  const [avatarStored, setAvatarStored] = React.useState(false);
 
   // Checks AsyncStorage for onboarded status. If onboarded, loads first and last name into Context hook for use throughout app
   React.useEffect(() => {
     const bootstrapAsync = async () => {
       try {
+        const userAvatarStoredStatus = await loadAvatarStoredStatus();
+        setAvatarStored(userAvatarStoredStatus);
         const userOnboardingCompleted = await loadOnboardingCompleted();
         setIsOnboardingCompleted(userOnboardingCompleted);
         //console.log(`bootstrapAsync: isOnboardingCompleted set to`, userOnboardingCompleted, `based on AsyncStorage.`);  //dev check
@@ -103,7 +106,7 @@ export default function App({ navigation }) {
         await setContextFirstName(newFirstName);
         try {
           await AsyncStorage.setItem('userFirstName', newFirstName);
-          console.log(`Context updateFirstName: AsyncStorage userFirstName updated to`,newFirstName);
+          //console.log(`Apps.js > Context updateFirstName > AsyncStorage userFirstName updated to`,newFirstName);
         } catch (e) {
           console.error(`Error saving first name to AsyncStorage: `,e);
         }
@@ -113,10 +116,46 @@ export default function App({ navigation }) {
         await setContextLastName(newLastName);
         try {
           await AsyncStorage.setItem('userLastName', newLastName);
-          console.log(`Context updateLastName: AsyncStorage userLastName updated to`,newLastName);
-          } catch (e) {
+          //console.log(`Apps.js > Context updateLastName: > AsyncStorage userLastName updated to`,newLastName);
+        } catch (e) {
           console.error(`Error saving first name to AsyncStorage: `,e);
-          }
+        }
+      },
+      deleteFirstName: async () => {
+        try {
+          await AsyncStorage.removeItem('userFirstName');
+          //console.log('Context deleteFirstName > userFirstName removed from AsyncStorage.');
+          await setContextFirstName('');
+        } catch (e) {
+          console.error('Context > Error removing user first name from AsyncStorage: ', e);
+        }
+      },
+      deleteLastName: async () => {
+        try {
+          await AsyncStorage.removeItem('userLastName');
+          //console.log('Context deleteLastName > userLastName removed from AsyncStorage.');
+          await setContextLastName('');
+        } catch (e) {
+          console.error('Context > Error removing user first name from AsyncStorage: ', e);
+        }
+      },
+      avatarOn: async (data) => {
+        // Turns on the avatar image in relevant elements
+        try {
+          await AsyncStorage.setItem('userAvatarStored', 'true');
+          setAvatarStored(true);
+        } catch (e) {
+          console.error(`App.js > avatarOn error setting userAvatarStored in AsyncStorage: `, e);
+        }
+      },
+      avatarOff: async (data) => {
+        // Turns on the avatar image in relevant elements
+        try {
+          await AsyncStorage.setItem('userAvatarStored', 'false');
+          setAvatarStored(false);
+        } catch (e) {
+          console.error(`App.js > avatarOn error setting userAvatarStored in AsyncStorage: `, e);
+        }
       },
     }),
     []
@@ -124,7 +163,7 @@ export default function App({ navigation }) {
 
   
   return (
-    <AuthContext.Provider value={{ isOnboardingCompleted, contextFirstName, contextLastName, ...authContext }}>
+    <AuthContext.Provider value={{ isOnboardingCompleted, avatarStored, contextFirstName, contextLastName, ...authContext }}>
       <NavigationContainer>
         <RootNavigator />
       </NavigationContainer>

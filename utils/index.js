@@ -85,3 +85,14 @@ export function useUpdateEffect(effect, dependencies = []) {
       }, 1000);
     }
   };
+
+
+  export const loadAvatarStoredStatus = async () => {
+    try {
+      const userAvatarStoredStatus = await AsyncStorage.getItem('userAvatarStored');
+      return userAvatarStoredStatus === 'true';
+    } catch (e) {
+      console.error(`Utils > Error loading userAvatarStored status: `, e);
+      return false;
+    } 
+  };

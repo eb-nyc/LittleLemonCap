@@ -11,7 +11,7 @@ import AuthContext from '../AuthContext';
 
 const Stack = createNativeStackNavigator();
 
-export default function RootNavigator() {
+export default function RootNavigator({setContextFirstName, setContextLastName}) {
 const { isOnboardingCompleted } = React.useContext(AuthContext); //Context hook variable for routing
 const [isLoading, setIsLoading] = useState(true);
 const [fontLoaded, setFontLoaded] = useState(false);
